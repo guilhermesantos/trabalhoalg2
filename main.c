@@ -34,7 +34,7 @@ int main() {
     dims.lista_dimensoes = NULL;
     dims.qtd_dimensoes = 0;
 
-    while(opcao_menu != 4) {
+    while(opcao_menu != 9) {
         exibe_menu();
         scanf("%d", &opcao_menu);
 
@@ -62,6 +62,14 @@ int main() {
             printf("\nEscolha o descendente: \n");
             opcao_dimensao = escolhe_dimensao(dims);
             int descendente = opcao_dimensao;
+
+            dims.lista_dimensoes[ancestral].agregacao = &(dims.lista_dimensoes[descendente]);
+            printf("agreg: %s -> %s\n", dims.lista_dimensoes[ancestral].nome, dims.lista_dimensoes[ancestral].agregacao->nome);
+            char sigla[3];
+            sigla[0] = dims.lista_dimensoes[ancestral].sigla;
+            sigla[1] = dims.lista_dimensoes[ancestral].agregacao->sigla;
+            sigla[2] = '\0';
+            printf("sigla criada: %s\n", sigla);
             break;
         case 5:
             break;
@@ -73,6 +81,7 @@ int main() {
             break;
         case 9:
             exit(0);
+            break;
         default:
             printf("\n Opcao invalida.\n");
             break;
