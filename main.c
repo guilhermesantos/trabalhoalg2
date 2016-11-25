@@ -70,6 +70,8 @@ int main() {
         case 7:
             break;
         case 8:
+            break;
+        case 9:
             exit(0);
         default:
             printf("\n Opcao invalida.\n");
