@@ -25,6 +25,8 @@ dimensao le_nova_dimensao();
 dimensao *acrescenta_atributo_numa_dimensao(dimensao *dim);
 atributo le_atributo();
 int escolhe_dimensao(dimensoes dims);
+void exibe_dimensao_com_agregacoes(dimensao *dim);
+void exibe_dimensoes_com_agregacoes(dimensoes dims);
 
 int main() {
     int opcao_menu = 0;
@@ -37,6 +39,8 @@ int main() {
     while(opcao_menu != 9) {
         exibe_menu();
         scanf("%d", &opcao_menu);
+
+        int qtd_entrou = 0;
 
         switch(opcao_menu) {
         case 1:
@@ -64,14 +68,9 @@ int main() {
             int descendente = opcao_dimensao;
 
             dims.lista_dimensoes[ancestral].agregacao = &(dims.lista_dimensoes[descendente]);
-            printf("agreg: %s -> %s\n", dims.lista_dimensoes[ancestral].nome, dims.lista_dimensoes[ancestral].agregacao->nome);
-            char sigla[3];
-            sigla[0] = dims.lista_dimensoes[ancestral].sigla;
-            sigla[1] = dims.lista_dimensoes[ancestral].agregacao->sigla;
-            sigla[2] = '\0';
-            printf("sigla criada: %s\n", sigla);
             break;
         case 5:
+            exibe_dimensao_com_agregacoes(&(dims.lista_dimensoes[0]), &qtd_entrou);
             break;
         case 6:
             break;
@@ -88,6 +87,38 @@ int main() {
         }
     }
     return 0;
+}
+
+void exibe_dimensoes_com_agregacoes(dimensoes dims) {
+    int i = 0;
+    for(i=0; i < dims.qtd_dimensoes; i++) {
+        if(dims.lista_dimensoes[i].agregacao != NULL) {
+
+        }
+    }
+}
+
+void exibe_dimensao_com_agregacoes(dimensao *dim) {
+    if(dim == NULL) {
+        return;
+    }
+    exibe_dimensao_com_agregacoes(dim->agregacao, qtd_entrou);
+    printf("%s ", dim->nome);
+    return;
+}
+
+void exibe_menu() {
+    printf("Sistema de data warehousing\n");
+    printf("1. Adicionar nova dimensao\n");
+    printf("2. Acrescentar um novo atributo a uma dimensao\n");
+    printf("3. Exibir dimensoes\n");
+    printf("4. Adicionar nova relacao de agregacao\n");
+    printf("5. Exibir dimensoes agregadas\n");
+    printf("6. Exibir grafo\n");
+    printf("7. Gravar em arquivo\n");
+    printf("8. Carregar de arquivo\n");
+    printf("9. Sair\n");
+    printf("Opcao: ");
 }
 
 int escolhe_dimensao(dimensoes dims) {
@@ -156,18 +187,4 @@ dimensao le_nova_dimensao() {
     d.atributos = NULL;
     d.qtd_atributos = 0;
     return d;
-}
-
-void exibe_menu() {
-    printf("Sistema de data warehousing\n");
-    printf("1. Adicionar nova dimensao\n");
-    printf("2. Acrescentar um novo atributo a uma dimensao\n");
-    printf("3. Exibir dimensoes\n");
-    printf("4. Adicionar nova relacao de agregacao\n");
-    printf("5. Exibir dimensoes agregadas\n");
-    printf("6. Exibir grafo\n");
-    printf("7. Gravar em arquivo\n");
-    printf("8. Carregar de arquivo\n");
-    printf("9. Sair\n");
-    printf("Opcao: ");
 }
