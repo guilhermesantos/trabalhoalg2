@@ -5,12 +5,18 @@
 
 typedef char* atributo;
 
+typedef enum cor {
+    preto,
+    branco,
+} cor;
+
 typedef struct dimensao {
     char sigla;
     char *nome;
     int qtd_atributos;
     atributo *atributos;
     struct dimensao *agregacao;
+    cor cor;
 } dimensao;
 
 typedef struct dimensoes {
@@ -25,8 +31,9 @@ dimensao le_nova_dimensao();
 dimensao *acrescenta_atributo_numa_dimensao(dimensao *dim);
 atributo le_atributo();
 int escolhe_dimensao(dimensoes dims);
-void exibe_dimensao_com_agregacoes(dimensao *dim);
+void exibe_dimensao_com_agregacoes(dimensao *dim, int primeiro);
 void exibe_dimensoes_com_agregacoes(dimensoes dims);
+void pinta_todas_as_dimensoes(dimensoes *dims, cor c);
 
 int main() {
     int opcao_menu = 0;
@@ -39,8 +46,6 @@ int main() {
     while(opcao_menu != 9) {
         exibe_menu();
         scanf("%d", &opcao_menu);
-
-        int qtd_entrou = 0;
 
         switch(opcao_menu) {
         case 1:
@@ -70,7 +75,7 @@ int main() {
             dims.lista_dimensoes[ancestral].agregacao = &(dims.lista_dimensoes[descendente]);
             break;
         case 5:
-            exibe_dimensao_com_agregacoes(&(dims.lista_dimensoes[0]));
+            exibe_dimensoes_com_agregacoes(dims);
             break;
         case 6:
             break;
@@ -89,21 +94,33 @@ int main() {
     return 0;
 }
 
-void exibe_dimensoes_com_agregacoes(dimensoes dims) {
+void pinta_todas_as_dimensoes(dimensoes *dims, cor c) {
     int i = 0;
-    for(i=0; i < dims.qtd_dimensoes; i++) {
-        if(dims.lista_dimensoes[i].agregacao != NULL) {
-
-        }
+    for(i=0; i < dims->qtd_dimensoes; i++) {
+        dims->lista_dimensoes[i].cor = c;
     }
 }
 
-void exibe_dimensao_com_agregacoes(dimensao *dim) {
-    if(dim == NULL) {
+void exibe_dimensoes_com_agregacoes(dimensoes dims) {
+    int i = 0;
+    pinta_todas_as_dimensoes(&dims, branco);
+
+    for(i=0; i < dims.qtd_dimensoes; i++) {
+        exibe_dimensao_com_agregacoes(&(dims.lista_dimensoes[i]), 1);
+        printf("\n");
+    }
+}
+
+void exibe_dimensao_com_agregacoes(dimensao *dim, int primeiro) {
+    if(dim == NULL || dim->cor == preto) {
         return;
     }
-    exibe_dimensao_com_agregacoes(dim->agregacao);
-    printf("%s ", dim->nome);
+    exibe_dimensao_com_agregacoes(dim->agregacao, 0);
+    dim->cor = preto;
+    printf("%s", dim->nome);
+    if(primeiro == 0) {
+        printf(" < ");
+    }
     return;
 }
 
@@ -111,9 +128,9 @@ void exibe_menu() {
     printf("Sistema de data warehousing\n");
     printf("1. Adicionar nova dimensao\n");
     printf("2. Acrescentar um novo atributo a uma dimensao\n");
-    printf("3. Exibir dimensoes\n");
+    printf("3. Exibir dimensoes e seus atributos\n");
     printf("4. Adicionar nova relacao de agregacao\n");
-    printf("5. Exibir dimensoes agregadas\n");
+    printf("5. Exibir agregacoes\n");
     printf("6. Exibir grafo\n");
     printf("7. Gravar em arquivo\n");
     printf("8. Carregar de arquivo\n");
