@@ -70,7 +70,7 @@ int main() {
             dims.lista_dimensoes[ancestral].agregacao = &(dims.lista_dimensoes[descendente]);
             break;
         case 5:
-            exibe_dimensao_com_agregacoes(&(dims.lista_dimensoes[0]), &qtd_entrou);
+            exibe_dimensao_com_agregacoes(&(dims.lista_dimensoes[0]));
             break;
         case 6:
             break;
@@ -102,7 +102,7 @@ void exibe_dimensao_com_agregacoes(dimensao *dim) {
     if(dim == NULL) {
         return;
     }
-    exibe_dimensao_com_agregacoes(dim->agregacao, qtd_entrou);
+    exibe_dimensao_com_agregacoes(dim->agregacao);
     printf("%s ", dim->nome);
     return;
 }
