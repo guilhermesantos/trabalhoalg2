@@ -15,7 +15,7 @@ typedef struct dimensao {
     char *nome;
     int qtd_atributos;
     atributo *atributos;
-    struct dimensao *agregacao;
+    int agregacao;
     cor cor;
 } dimensao;
 
@@ -31,13 +31,15 @@ dimensao le_nova_dimensao();
 dimensao *acrescenta_atributo_numa_dimensao(dimensao *dim);
 atributo le_atributo();
 int escolhe_dimensao(dimensoes dims);
-void exibe_dimensao_com_agregacoes(dimensao *dim, int primeiro);
+void exibe_dimensao_com_agregacoes(dimensoes *dims, int indice_dimensao, int primeiro);
 void exibe_dimensoes_com_agregacoes(dimensoes dims);
 void pinta_todas_as_dimensoes(dimensoes *dims, cor c);
 
 int main() {
     int opcao_menu = 0;
     int opcao_dimensao = 0;
+    int ancestral;
+    int descendente;
 
     dimensoes dims;
     dims.lista_dimensoes = NULL;
@@ -48,45 +50,48 @@ int main() {
         scanf("%d", &opcao_menu);
 
         switch(opcao_menu) {
-        case 1:
+        case 1://cadastrando nova dimensao
             dims.qtd_dimensoes++;
             dims.lista_dimensoes = realloc(dims.lista_dimensoes, sizeof(dimensao)*dims.qtd_dimensoes);
             dims.lista_dimensoes[dims.qtd_dimensoes-1] = le_nova_dimensao();
             exibe_dimensoes(dims);
             break;
-        case 2:
+        case 2://cadastrando novo atributo para uma dimensao
             opcao_dimensao = escolhe_dimensao(dims);
             dims.lista_dimensoes[opcao_dimensao] =
             *acrescenta_atributo_numa_dimensao(&(dims.lista_dimensoes[opcao_dimensao]));
 
             break;
-        case 3:
+        case 3://exibindo dimensoes cadastradas
             exibe_dimensoes(dims);
             break;
-        case 4:
-            printf("\nEscolha o ancestral: \n");
-            opcao_dimensao = escolhe_dimensao(dims);
-            int ancestral = opcao_dimensao;
+        case 4://configura uma dimensao como uma agregacao de outra dimensao
+            exibe_dimensoes(dims);
+            printf("Escolha o ancestral: ");
+            scanf("%d", &ancestral);
+            printf("\n");
 
-            printf("\nEscolha o descendente: \n");
-            opcao_dimensao = escolhe_dimensao(dims);
-            int descendente = opcao_dimensao;
+            exibe_dimensoes(dims);
+            printf("Escolha o descendente: ");
+            scanf("%d", &descendente);
+            printf("\n");
 
-            dims.lista_dimensoes[ancestral].agregacao = &(dims.lista_dimensoes[descendente]);
+            dims.lista_dimensoes[ancestral].agregacao = descendente;
+
             break;
-        case 5:
+        case 5://exibe as dimensoes e suas agregacoes
             exibe_dimensoes_com_agregacoes(dims);
             break;
-        case 6:
+        case 6://constroi e exibe o grafo de derivacao
             break;
-        case 7:
+        case 7://grava os dados em um arquivo
             break;
-        case 8:
+        case 8://carrega os dados de um arquivo
             break;
-        case 9:
+        case 9://sai do programa
             exit(0);
             break;
-        default:
+        default://digitou um valor que nao eh uma opcao do menu
             printf("\n Opcao invalida.\n");
             break;
         }
@@ -104,23 +109,24 @@ void pinta_todas_as_dimensoes(dimensoes *dims, cor c) {
 void exibe_dimensoes_com_agregacoes(dimensoes dims) {
     int i = 0;
     pinta_todas_as_dimensoes(&dims, branco);
-
     for(i=0; i < dims.qtd_dimensoes; i++) {
-        exibe_dimensao_com_agregacoes(&(dims.lista_dimensoes[i]), 1);
+        exibe_dimensao_com_agregacoes(&dims, i, 1);
         printf("\n");
     }
 }
 
-void exibe_dimensao_com_agregacoes(dimensao *dim, int primeiro) {
-    if(dim == NULL || dim->cor == preto) {
+void exibe_dimensao_com_agregacoes(dimensoes *dims, int indice_dimensao, int primeiro) {
+    if(dims->lista_dimensoes[indice_dimensao].cor == preto || indice_dimensao == -1) {
         return;
     }
-    exibe_dimensao_com_agregacoes(dim->agregacao, 0);
-    dim->cor = preto;
-    printf("%s", dim->nome);
+    exibe_dimensao_com_agregacoes(dims, dims->lista_dimensoes[indice_dimensao].agregacao, 0);
+
+    printf("%s", dims->lista_dimensoes[indice_dimensao].nome);
     if(primeiro == 0) {
         printf(" < ");
     }
+    dims->lista_dimensoes[indice_dimensao].cor = preto;
+
     return;
 }
 
@@ -200,7 +206,7 @@ dimensao le_nova_dimensao() {
     scanf(" %c", &sigla_dimensao);
     d.nome = nome_dimensao;
     d.sigla = sigla_dimensao;
-    d.agregacao = NULL;
+    d.agregacao = -1;
     d.atributos = NULL;
     d.qtd_atributos = 0;
     return d;
