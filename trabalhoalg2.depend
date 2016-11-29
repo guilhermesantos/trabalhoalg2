@@ -1,9 +1,10 @@
 # depslib dependency file v1.0
-1480392475 source:d:\documents\c_workspace\trabalhoalg2\main.c
+1480447001 source:d:\documents\c_workspace\trabalhoalg2\main.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
 	"grafo_lista.h"
+	"include/graphviz/gvc.h"
 
 1479947091 d:\documents\c_workspace\trabalhoalg2\grafo_lista.c
 	<stdio.h>
@@ -19,4 +20,108 @@
 1480037721 d:\documents\c_workspace\trabalhoalg2\grafo_lista.h
 	<stdio.h>
 	<stdlib.h>
+
+1347542534 d:\documents\c_workspace\trabalhoalg2\graphviz\cgraph.h
+	"cdt.h"
+
+1347542534 d:\documents\c_workspace\trabalhoalg2\graphviz\cdt.h
+	<string.h>
+	<ast_std.h>
+	"ast_common.h"
+
+1347542534 d:\documents\c_workspace\trabalhoalg2\graphviz\gvc.h
+	"types.h"
+	"gvplugin.h"
+
+1480441927 d:\documents\c_workspace\trabalhoalg2\graphviz\types.h
+	<stdio.h>
+	<assert.h>
+	<signal.h>
+	"geom.h"
+	"gvcext.h"
+	"pathgeom.h"
+	"textpara.h"
+	<cgraph.h>
+	"usershape.h"
+	"cgraph.h"
+	"graph.h"
+
+1347542534 d:\documents\c_workspace\trabalhoalg2\graphviz\geom.h
+	"arith.h"
+
+1347542534 d:\documents\c_workspace\trabalhoalg2\graphviz\arith.h
+	<limits.h>
+	<values.h>
+	<math.h>
+
+1347542534 d:\documents\c_workspace\trabalhoalg2\graphviz\gvcext.h
+
+1347542534 d:\documents\c_workspace\trabalhoalg2\graphviz\pathgeom.h
+
+1347542534 d:\documents\c_workspace\trabalhoalg2\graphviz\textpara.h
+
+1347542534 d:\documents\c_workspace\trabalhoalg2\graphviz\usershape.h
+	"cdt.h"
+
+1347542534 d:\documents\c_workspace\trabalhoalg2\graphviz\graph.h
+	<ast.h>
+	<sys/types.h>
+	<stdlib.h>
+	<stdio.h>
+	"cdt.h"
+
+1347542534 d:\documents\c_workspace\trabalhoalg2\graphviz\gvplugin.h
+	"gvcext.h"
+
+1347542534 d:\graphviz2.30\include\graphviz\gvc.h
+	"types.h"
+	"gvplugin.h"
+
+1347542534 d:\graphviz2.30\include\graphviz\types.h
+	<stdio.h>
+	<assert.h>
+	<signal.h>
+	"geom.h"
+	"gvcext.h"
+	"pathgeom.h"
+	"textpara.h"
+	<cgraph.h>
+	"usershape.h"
+	"cgraph.h"
+	"graph.h"
+
+1347542534 d:\graphviz2.30\include\graphviz\geom.h
+	"arith.h"
+
+1347542534 d:\graphviz2.30\include\graphviz\arith.h
+	<limits.h>
+	<values.h>
+	<math.h>
+
+1347542534 d:\graphviz2.30\include\graphviz\gvcext.h
+
+1347542534 d:\graphviz2.30\include\graphviz\pathgeom.h
+
+1347542534 d:\graphviz2.30\include\graphviz\textpara.h
+
+1347542534 d:\graphviz2.30\include\graphviz\usershape.h
+	"cdt.h"
+
+1347542534 d:\graphviz2.30\include\graphviz\cdt.h
+	<string.h>
+	<ast_std.h>
+	"ast_common.h"
+
+1347542534 d:\graphviz2.30\include\graphviz\cgraph.h
+	"cdt.h"
+
+1347542534 d:\graphviz2.30\include\graphviz\graph.h
+	<ast.h>
+	<sys/types.h>
+	<stdlib.h>
+	<stdio.h>
+	"cdt.h"
+
+1347542534 d:\graphviz2.30\include\graphviz\gvplugin.h
+	"gvcext.h"
 
