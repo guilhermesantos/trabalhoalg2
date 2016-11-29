@@ -34,6 +34,8 @@ int escolhe_dimensao(dimensoes dims);
 void exibe_dimensao_com_agregacoes(dimensoes *dims, int indice_dimensao, int primeiro);
 void exibe_dimensoes_com_agregacoes(dimensoes dims);
 void pinta_todas_as_dimensoes(dimensoes *dims, cor c);
+void grava_dados_arquivo(dimensoes dims);
+dimensoes *carrega_dados_arquivo();
 
 int main() {
     int opcao_menu = 0;
@@ -60,7 +62,7 @@ int main() {
             opcao_dimensao = escolhe_dimensao(dims);
             dims.lista_dimensoes[opcao_dimensao] =
             *acrescenta_atributo_numa_dimensao(&(dims.lista_dimensoes[opcao_dimensao]));
-
+            exibe_dimensoes(dims);
             break;
         case 3://exibindo dimensoes cadastradas
             exibe_dimensoes(dims);
@@ -77,7 +79,7 @@ int main() {
             printf("\n");
 
             dims.lista_dimensoes[ancestral].agregacao = descendente;
-
+            exibe_dimensoes_com_agregacoes(dims);
             break;
         case 5://exibe as dimensoes e suas agregacoes
             exibe_dimensoes_com_agregacoes(dims);
@@ -85,8 +87,10 @@ int main() {
         case 6://constroi e exibe o grafo de derivacao
             break;
         case 7://grava os dados em um arquivo
+            grava_dados_arquivo(dims);
             break;
         case 8://carrega os dados de um arquivo
+            dims = *carrega_dados_arquivo();
             break;
         case 9://sai do programa
             exit(0);
@@ -99,6 +103,72 @@ int main() {
     return 0;
 }
 
+void grava_dados_arquivo(dimensoes dims) {
+    FILE *f = fopen("dimensoes.dat", "wb");
+    if(f == NULL) {
+        printf("O arquivo especificado nao pode ser criado.\n");
+        return;
+    }
+    fwrite(&(dims.qtd_dimensoes), sizeof(int), 1, f);
+    int i, j, tam_nome, tam_atributo, cor;
+
+
+    for(i=0; i < dims.qtd_dimensoes; i++) {
+        fwrite(&(dims.lista_dimensoes[i].sigla), sizeof(char), 1, f);
+        tam_nome = strlen(dims.lista_dimensoes[i].nome)+1;
+        fwrite(&tam_nome, sizeof(int), 1, f);
+        fwrite(dims.lista_dimensoes[i].nome, sizeof(char), strlen(dims.lista_dimensoes[i].nome)+1, f);
+        fwrite(&(dims.lista_dimensoes[i].qtd_atributos), sizeof(int), 1, f);
+
+        for(j=0; j < dims.lista_dimensoes[i].qtd_atributos; j++) {
+            tam_atributo = strlen(dims.lista_dimensoes[i].atributos[j])+1;
+            fwrite(&tam_atributo, sizeof(int), 1, f);
+            fwrite(dims.lista_dimensoes[i].atributos[j], sizeof(char), tam_atributo, f);
+        }
+
+        fwrite(&(dims.lista_dimensoes[i].agregacao), sizeof(int), 1, f);
+    }
+    printf("Dados gravados com sucesso.\n\n");
+    fclose(f);
+}
+
+dimensoes *carrega_dados_arquivo() {
+    dimensoes dims;
+    FILE *f = fopen("dimensoes.dat", "rb");
+    if(f == NULL) {
+        printf("O arquivo especificado nao existe ou nao pode ser aberto.\n");
+
+        return NULL;
+    }
+    fread(&(dims.qtd_dimensoes), sizeof(int), 1, f);
+    dims.lista_dimensoes = malloc(sizeof(dimensao)*dims.qtd_dimensoes);
+
+    int i, j, k = 0, tam_nome = 0, tam_atributo = 0;
+
+    for(i = 0; i < dims.qtd_dimensoes; i++) {
+        dimensao dim;
+        dim.nome = NULL;
+        dim.atributos = NULL;
+        fread(&(dim.sigla), sizeof(char), 1, f);
+        fread(&(tam_nome), sizeof(int), 1, f);
+        dim.nome = malloc(sizeof(char)*tam_nome);
+        fread(dim.nome, sizeof(char), tam_nome, f);
+        fread(&(dim.qtd_atributos), sizeof(int), 1, f);
+        dim.atributos = malloc(sizeof(atributo)*dim.qtd_atributos);
+
+        for(j=0; j < dim.qtd_atributos; j++) {
+            fread(&tam_atributo, sizeof(int), 1, f);
+            dim.atributos[j] = malloc(sizeof(char)*tam_atributo);
+            fread(dim.atributos[j], sizeof(char), tam_atributo, f);
+        }
+        fread(&(dim.agregacao), sizeof(int), 1, f);
+        dims.lista_dimensoes[i] = dim;
+    }
+    printf("Dados carregados com sucesso.\n\n");
+    fclose(f);
+    return &dims;
+}
+
 void pinta_todas_as_dimensoes(dimensoes *dims, cor c) {
     int i = 0;
     for(i=0; i < dims->qtd_dimensoes; i++) {
@@ -107,12 +177,20 @@ void pinta_todas_as_dimensoes(dimensoes *dims, cor c) {
 }
 
 void exibe_dimensoes_com_agregacoes(dimensoes dims) {
-    int i = 0;
-    pinta_todas_as_dimensoes(&dims, branco);
-    for(i=0; i < dims.qtd_dimensoes; i++) {
-        exibe_dimensao_com_agregacoes(&dims, i, 1);
-        printf("\n");
+    printf("\n=====================\n");
+    printf("AGREGACOES CADASTRADAS\n");
+    printf("=====================\n");
+    if(dims.qtd_dimensoes == 0) {
+        printf("Nao ha dimensoes cadastradas.\n");
+    } else {
+        int i = 0;
+        pinta_todas_as_dimensoes(&dims, branco);
+        for(i=0; i < dims.qtd_dimensoes; i++) {
+            exibe_dimensao_com_agregacoes(&dims, i, 1);
+            printf("\n");
+        }
     }
+    printf("\n");
 }
 
 void exibe_dimensao_com_agregacoes(dimensoes *dims, int indice_dimensao, int primeiro) {
@@ -178,10 +256,14 @@ void exibe_dimensoes(dimensoes dims) {
     printf("\n=====================\n");
     printf("DIMENSOES CADASTRADAS\n");
     printf("=====================\n");
-    int i = 0;
-    for(i=0; i < dims.qtd_dimensoes; i++) {
-        printf("%d\.", i);
-        exibe_dimensao(dims.lista_dimensoes[i]);
+    if(dims.qtd_dimensoes == 0) {
+        printf("Nao ha dimensoes cadastradas.\n");
+    } else {
+        int i = 0;
+        for(i=0; i < dims.qtd_dimensoes; i++) {
+            printf("%d\.", i);
+            exibe_dimensao(dims.lista_dimensoes[i]);
+        }
     }
     printf("\n");
 }
