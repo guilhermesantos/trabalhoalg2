@@ -50,6 +50,7 @@ int main() {
 
     grafo *g;
     char *codigo_dot;
+    char gera_visualizacao = 'n';
 
     while(opcao_menu != 9) {
         exibe_menu();
@@ -109,6 +110,17 @@ int main() {
             codigo_dot = gera_codigo_dot(g);
             grava_codigo_dot_em_arquivo(codigo_dot);
 
+            printf("Se tiver o graphviz instalado, E REGISTRADO NA VARIAVEL DE AMBIENTE PATH,\n");
+            printf("eh possivel gerar o arquivo de visualizacao do grafo.\n");
+            printf("Gerar visualizacao? s/n: ");
+            scanf(" %c", &gera_visualizacao);
+            if(gera_visualizacao == 's') {
+                printf("Gerando visualizacao...\n");
+                system("dot -Tpng grafo.dot -o grafo.png");
+                printf("Visualizacao gerada. Verificar o arquivo grafo.png.\n\n");
+            } else {
+                printf("Foi digitado 'n' ou algum caracter invalido, portanto a visualizacao nao sera gerada.\n\n");
+            }
             break;
         case 7://grava os dados em um arquivo
             grava_dados_arquivo(dims);
