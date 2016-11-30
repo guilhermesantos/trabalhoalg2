@@ -66,7 +66,7 @@ int busca_numero_do_vertice_por_valor(grafo *g, char *valor) {
 }
 
 char *gera_codigo_dot(grafo *g) {
-    char declaracao[] = "digraph derivacao {";
+    char declaracao[] = "digraph derivacao {\n";
     char encerramento[] = "}";
     char *codigo = malloc(sizeof(char)*4000);
     strcpy(codigo, declaracao);
@@ -77,6 +77,7 @@ char *gera_codigo_dot(grafo *g) {
         vertice v = g->vertices[i];
         adj_atual = g->vertices[i].lista_adj;
         while(adj_atual != NULL) {
+            strcat(codigo, "\t");
             strcat(codigo, stringfica_aresta(v, g->vertices[adj_atual->num_vertice]));
             strcat(codigo, ";\n");
             adj_atual = adj_atual->prox;
