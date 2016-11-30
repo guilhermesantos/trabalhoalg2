@@ -109,6 +109,7 @@ int main() {
 
             codigo_dot = gera_codigo_dot(g);
             grava_codigo_dot_em_arquivo(codigo_dot);
+            printf("Foi gerado o arquivo grafo.dot com o codigo para gerar a visualizacao do grafo.\n");
 
             printf("Se tiver o graphviz instalado, E REGISTRADO NA VARIAVEL DE AMBIENTE PATH,\n");
             printf("eh possivel gerar o arquivo de visualizacao do grafo.\n");
