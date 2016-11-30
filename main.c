@@ -36,6 +36,7 @@ void exibe_dimensoes_com_agregacoes(dimensoes dims);
 void pinta_todas_as_dimensoes(dimensoes *dims, cor c);
 void grava_dados_arquivo(dimensoes dims);
 dimensoes *carrega_dados_arquivo();
+void grava_codigo_dot_em_arquivo(char *codigo_dot);
 
 int main() {
     int opcao_menu = 0;
@@ -46,6 +47,9 @@ int main() {
     dimensoes dims;
     dims.lista_dimensoes = NULL;
     dims.qtd_dimensoes = 0;
+
+    grafo *g;
+    char *codigo_dot;
 
     while(opcao_menu != 9) {
         exibe_menu();
@@ -85,6 +89,26 @@ int main() {
             exibe_dimensoes_com_agregacoes(dims);
             break;
         case 6://constroi e exibe o grafo de derivacao
+            g = cria_grafo();
+            insere_vertice(g, "a");
+            insere_vertice(g, "b");
+            insere_vertice(g, "c");
+            insere_vertice(g, "d");
+            insere_vertice(g, "e");
+            insere_vertice(g, "f");
+            insere_vertice(g, "g");
+
+            insere_aresta_por_valor(g, "a", "b");
+            insere_aresta_por_valor(g, "a", "c");
+            insere_aresta_por_valor(g, "c", "d");
+            insere_aresta_por_valor(g, "c", "e");
+            insere_aresta_por_valor(g, "e", "f");
+            insere_aresta_por_valor(g, "e", "g");
+            insere_aresta_por_valor(g, "f", "f");
+
+            codigo_dot = gera_codigo_dot(g);
+            grava_codigo_dot_em_arquivo(codigo_dot);
+
             break;
         case 7://grava os dados em um arquivo
             grava_dados_arquivo(dims);
@@ -103,10 +127,21 @@ int main() {
     return 0;
 }
 
+void grava_codigo_dot_em_arquivo(char *codigo_dot) {
+    FILE *f = fopen("grafo.dot", "w");
+    if(f == NULL) {
+        printf("Erro. O arquivo do grafo nao pode ser criado.\n\n");
+        return;
+    }
+    fwrite(codigo_dot, sizeof(char), strlen(codigo_dot)+1, f);
+    fclose(f);
+    printf("Foi gerado o arquivo grafo.dot com a visualizacao do grafo criado.\n\n");
+}
+
 void grava_dados_arquivo(dimensoes dims) {
     FILE *f = fopen("dimensoes.dat", "wb");
     if(f == NULL) {
-        printf("O arquivo especificado nao pode ser criado.\n");
+        printf("Erro. O arquivo especificado nao pode ser criado.\n");
         return;
     }
     fwrite(&(dims.qtd_dimensoes), sizeof(int), 1, f);

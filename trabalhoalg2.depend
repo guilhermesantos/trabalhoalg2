@@ -1,10 +1,9 @@
 # depslib dependency file v1.0
-1480447001 source:d:\documents\c_workspace\trabalhoalg2\main.c
+1480469052 source:d:\documents\c_workspace\trabalhoalg2\main.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
 	"grafo_lista.h"
-	"include/graphviz/gvc.h"
 
 1479947091 d:\documents\c_workspace\trabalhoalg2\grafo_lista.c
 	<stdio.h>
@@ -13,11 +12,11 @@
 1478008574 source:d:\documents\c_workspace\trabalhoalg2\teste.c
 	<stdio.h>
 
-1480037715 source:d:\documents\c_workspace\trabalhoalg2\grafo_lista.c
+1480469033 source:d:\documents\c_workspace\trabalhoalg2\grafo_lista.c
 	"grafo_lista.h"
 	<string.h>
 
-1480037721 d:\documents\c_workspace\trabalhoalg2\grafo_lista.h
+1480463179 d:\documents\c_workspace\trabalhoalg2\grafo_lista.h
 	<stdio.h>
 	<stdlib.h>
 

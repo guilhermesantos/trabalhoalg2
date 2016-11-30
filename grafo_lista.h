@@ -23,6 +23,7 @@ typedef struct grafo {
 grafo *cria_grafo();
 grafo *insere_vertice(grafo *g, char *valor);
 void imprime_grafo(grafo *g);
+char *gera_codigo_dot(grafo *g);
 
 grafo *insere_aresta_por_numero(grafo *g, int numero_vertice_origem, int numero_vertice_destino);
 grafo *insere_aresta_bidirecional_por_numero(grafo *g, int numero_vertice_origem, int numero_vertice_destino);

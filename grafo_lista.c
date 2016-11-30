@@ -2,6 +2,7 @@
 #include <string.h>
 
 int busca_numero_do_vertice_por_valor(grafo *g, char *valor);
+char *stringfica_aresta(vertice v1, vertice v2);
 
 grafo *cria_grafo() {
     grafo *g = (grafo*)malloc(sizeof(grafo));
@@ -62,6 +63,36 @@ int busca_numero_do_vertice_por_valor(grafo *g, char *valor) {
         }
     }
     return -1;
+}
+
+char *gera_codigo_dot(grafo *g) {
+    char declaracao[] = "digraph derivacao {";
+    char encerramento[] = "}";
+    char *codigo = malloc(sizeof(char)*4000);
+    strcpy(codigo, declaracao);
+
+    int i;
+    no_adj *adj_atual;
+    for(i=0; i < g->qtd_vertices; i++) {
+        vertice v = g->vertices[i];
+        adj_atual = g->vertices[i].lista_adj;
+        while(adj_atual != NULL) {
+            strcat(codigo, stringfica_aresta(v, g->vertices[adj_atual->num_vertice]));
+            strcat(codigo, ";\n");
+            adj_atual = adj_atual->prox;
+        }
+    }
+
+    strcat(codigo, encerramento);
+    return codigo;
+}
+
+char *stringfica_aresta(vertice v1, vertice v2) {
+    char *resultado = malloc(strlen(v1.valor)+strlen(" -> ")+strlen(v2.valor)+1);
+    strcpy(resultado, v1.valor);
+    strcat(resultado, " -> ");
+    strcat(resultado, v2.valor);
+    return resultado;
 }
 
 void imprime_grafo(grafo *g) {
