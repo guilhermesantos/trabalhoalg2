@@ -24,6 +24,8 @@ typedef struct dimensoes {
     int qtd_dimensoes;
 } dimensoes;
 
+
+int *inverte_vetor(int **vetor, int qtd_elems);
 void exibe_menu();
 void exibe_dimensoes(dimensoes dims);
 void exibe_dimensao(dimensao dim);
@@ -161,7 +163,6 @@ int main() {
     }
     return 0;
 }
-int *inverte_vetor(int **vetor, int qtd_elems);
 
 int **gera_hierarquias(dimensoes dims, int *quantidade_hier, int **qtd_dimensoes_por_hier) {
     int i = 0, j = 0;
