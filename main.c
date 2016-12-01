@@ -37,12 +37,20 @@ void pinta_todas_as_dimensoes(dimensoes *dims, cor c);
 void grava_dados_arquivo(dimensoes dims);
 dimensoes *carrega_dados_arquivo();
 void grava_codigo_dot_em_arquivo(char *codigo_dot);
+int **gera_hierarquias(dimensoes dims, int *quantidade_hier, int **qtd_dimensoes_por_hier);
+int *descobre_hierarquia(dimensoes *dims, int indice_dim, int **hierarquia_dimensao,
+                         int *qtd_agregacoes_hierarquia);
 
 int main() {
     int opcao_menu = 0;
     int opcao_dimensao = 0;
     int ancestral;
     int descendente;
+    int i, j;
+
+    int quantidade_hierarquias;
+    int *quantidade_dimensoes_por_hierarquia;
+    int **hierarquias;
 
     dimensoes dims;
     dims.lista_dimensoes = NULL;
@@ -107,7 +115,19 @@ int main() {
             insere_aresta_por_valor(g, "e", "g");
             insere_aresta_por_valor(g, "f", "f");
 
-            codigo_dot = gera_codigo_dot(g);
+            //hierarquias, quantidade_hierarquias e quantidade_dimensoes_por_hierarquia
+            //foram declaradas no comeco da main porque o C da problema se declarar variavel no
+            //meio do switch
+            //Isso eh um exemplo de como varrer a matriz de hierarquias. Esse caso imprime a matriz
+            hierarquias = gera_hierarquias(dims, &quantidade_hierarquias, &quantidade_dimensoes_por_hierarquia);
+            for(i=0; i < quantidade_hierarquias; i++) {
+                printf("hierarquia [%d]: ", i);
+                for(j = 0; j < quantidade_dimensoes_por_hierarquia[i]; j++) {
+                    printf("%d ", hierarquias[i][j]);
+                }
+                printf("\n");
+            }
+            /*codigo_dot = gera_codigo_dot(g);
             grava_codigo_dot_em_arquivo(codigo_dot);
             printf("Foi gerado o arquivo grafo.dot com o codigo para gerar a visualizacao do grafo.\n");
 
@@ -121,7 +141,9 @@ int main() {
                 printf("Visualizacao gerada. Verificar o arquivo grafo.png.\n\n");
             } else {
                 printf("Foi digitado 'n' ou algum caracter invalido, portanto a visualizacao nao sera gerada.\n\n");
-            }
+            }*/
+
+            //gera_grafo_derivacao(dims);
             break;
         case 7://grava os dados em um arquivo
             grava_dados_arquivo(dims);
@@ -138,6 +160,67 @@ int main() {
         }
     }
     return 0;
+}
+int *inverte_vetor(int **vetor, int qtd_elems);
+
+int **gera_hierarquias(dimensoes dims, int *quantidade_hier, int **qtd_dimensoes_por_hier) {
+    int i = 0, j = 0;
+
+    int qtd_hierarquias = 0;
+    int **hierarquias = NULL;
+    int *qtd_dimensoes_por_hierarquia = NULL;
+
+    pinta_todas_as_dimensoes(&dims, branco);
+
+    for(i=0; i < dims.qtd_dimensoes; i++) {
+        if(dims.lista_dimensoes[i].cor != preto) {
+            qtd_hierarquias++;
+            hierarquias = realloc(hierarquias, sizeof(int*)*qtd_hierarquias);
+            hierarquias[qtd_hierarquias-1] = NULL;
+            qtd_dimensoes_por_hierarquia = realloc(qtd_dimensoes_por_hierarquia, sizeof(int)*qtd_hierarquias);
+            qtd_dimensoes_por_hierarquia[qtd_hierarquias-1] = 0;
+            hierarquias[qtd_hierarquias-1] = descobre_hierarquia(&dims, i, &hierarquias[qtd_hierarquias-1],
+                                                           &qtd_dimensoes_por_hierarquia[qtd_hierarquias-1]);
+        }
+    }
+
+    for(i=0; i < qtd_hierarquias; i++) {
+        hierarquias[i] = inverte_vetor(&hierarquias[i], qtd_dimensoes_por_hierarquia[i]);
+    }
+
+    *quantidade_hier = qtd_hierarquias;
+    qtd_dimensoes_por_hier[0] = qtd_dimensoes_por_hierarquia;
+    return hierarquias;
+}
+
+int *inverte_vetor(int **vetor, int qtd_elems) {
+    int i;
+    int j = qtd_elems-1;
+    int *novo_vetor = malloc(sizeof(int)*qtd_elems);
+    for(i=0; i < qtd_elems; i++) {
+        novo_vetor[j] = vetor[0][i];
+        j--;
+    }
+
+    for(i=0; i < qtd_elems; i++) {
+        vetor[0][i] = novo_vetor[i];
+    }
+    return vetor[0];
+}
+
+int *descobre_hierarquia(dimensoes *dims, int indice_dim, int **hierarquia_dimensao,
+                         int *qtd_agregacoes_hierarquia) {
+    if(indice_dim == -1 || dims->lista_dimensoes[indice_dim].cor == preto) {
+        return;
+    }
+
+    descobre_hierarquia(dims, dims->lista_dimensoes[indice_dim].agregacao,
+                        hierarquia_dimensao, qtd_agregacoes_hierarquia);
+    dims->lista_dimensoes[indice_dim].cor = preto;
+    (*qtd_agregacoes_hierarquia)++;
+    hierarquia_dimensao[0] = realloc(hierarquia_dimensao[0], sizeof(int)*(*qtd_agregacoes_hierarquia));
+    hierarquia_dimensao[0][(*qtd_agregacoes_hierarquia)-1] = indice_dim;
+    return hierarquia_dimensao[0];
 }
 
 void grava_codigo_dot_em_arquivo(char *codigo_dot) {
