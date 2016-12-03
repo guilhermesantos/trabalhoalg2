@@ -137,17 +137,18 @@ int main() {
             //foram declaradas no comeco da main porque o C da problema se declarar variavel no
             //meio do switch
             //Isso eh um exemplo de como varrer a matriz de hierarquias. Esse caso imprime a matriz
-            /*
+            
             hierarquias = gera_hierarquias(dims, &quantidade_hierarquias, &quantidade_dimensoes_por_hierarquia);
             for(i=0; i < quantidade_hierarquias; i++) {
-                printf("hierarquia [%d]: ", i);
+                //printf("hierarquia [%d]: ", i);
                 for(j = 0; j < quantidade_dimensoes_por_hierarquia[i]; j++) {
-                    char aux[2] = {dims.lista_dimensoes[(hierarquias[0][0])].sigla, '\0'};
-                    printf("%s %d %d", aux, i, j);
+                    char aux[2] = {dims.lista_dimensoes[(hierarquias[i][j])].sigla, '\0'};
+                    insere_vertice(g, aux);
+                    printf("%s ", aux);
                 }
                 printf("\n");
-            }*/
-
+            }
+            /*
             //versao sem combinacao (teste)
             int i, j;
             //insere vertices
@@ -167,7 +168,7 @@ int main() {
                     printf("%s \t %s \n", aux, auxp);
                 }
             }
-
+            */
             //insere_vertices_agregados(g, dims, hierarquias, &quantidade_hierarquias, &quantidade_dimensoes_por_hierarquia);
             codigo_dot = gera_codigo_dot(g);
             grava_codigo_dot_em_arquivo(codigo_dot);
