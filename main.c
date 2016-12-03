@@ -29,12 +29,16 @@ int *inverte_vetor(int **vetor, int qtd_elems);
 void exibe_menu();
 void exibe_dimensoes(dimensoes dims);
 void exibe_dimensao(dimensao dim);
+
 dimensao le_nova_dimensao();
 dimensao *acrescenta_atributo_numa_dimensao(dimensao *dim);
 atributo le_atributo();
+
 int escolhe_dimensao(dimensoes dims);
+
 void exibe_dimensao_com_agregacoes(dimensoes *dims, int indice_dimensao, int primeiro);
 void exibe_dimensoes_com_agregacoes(dimensoes dims);
+
 void pinta_todas_as_dimensoes(dimensoes *dims, cor c);
 void grava_dados_arquivo(dimensoes dims);
 dimensoes *carrega_dados_arquivo();
@@ -42,6 +46,9 @@ void grava_codigo_dot_em_arquivo(char *codigo_dot);
 int **gera_hierarquias(dimensoes dims, int *quantidade_hier, int **qtd_dimensoes_por_hier);
 int *descobre_hierarquia(dimensoes *dims, int indice_dim, int **hierarquia_dimensao,
                          int *qtd_agregacoes_hierarquia);
+
+void insere_vertices_agregados(grafo *g, dimensoes dim,int **hier, int *qtd_h, int **qtd_dim_h);
+void insere_vertices_agregados_recursao(dimensoes *dims, int indice_dimensao, int primeiro);
 
 int main() {
     int opcao_menu = 0;
@@ -68,21 +75,25 @@ int main() {
 
         switch(opcao_menu) {
         case 1://cadastrando nova dimensao
+            system("clear");
             dims.qtd_dimensoes++;
             dims.lista_dimensoes = realloc(dims.lista_dimensoes, sizeof(dimensao)*dims.qtd_dimensoes);
             dims.lista_dimensoes[dims.qtd_dimensoes-1] = le_nova_dimensao();
             exibe_dimensoes(dims);
             break;
         case 2://cadastrando novo atributo para uma dimensao
+            system("clear");
             opcao_dimensao = escolhe_dimensao(dims);
             dims.lista_dimensoes[opcao_dimensao] =
             *acrescenta_atributo_numa_dimensao(&(dims.lista_dimensoes[opcao_dimensao]));
             exibe_dimensoes(dims);
             break;
         case 3://exibindo dimensoes cadastradas
+            system("clear");
             exibe_dimensoes(dims);
             break;
         case 4://configura uma dimensao como uma agregacao de outra dimensao
+            system("clear");
             exibe_dimensoes(dims);
             printf("Escolha o ancestral: ");
             scanf("%d", &ancestral);
@@ -97,11 +108,15 @@ int main() {
             exibe_dimensoes_com_agregacoes(dims);
             break;
         case 5://exibe as dimensoes e suas agregacoes
+            system("clear");
             exibe_dimensoes_com_agregacoes(dims);
             break;
         case 6://constroi e exibe o grafo de derivacao
+            system("clear");
             g = cria_grafo();
-            insere_vertice(g, "a");
+            
+            //aqui funciona!!!
+            /*
             insere_vertice(g, "b");
             insere_vertice(g, "c");
             insere_vertice(g, "d");
@@ -116,20 +131,45 @@ int main() {
             insere_aresta_por_valor(g, "e", "f");
             insere_aresta_por_valor(g, "e", "g");
             insere_aresta_por_valor(g, "f", "f");
+            */
 
             //hierarquias, quantidade_hierarquias e quantidade_dimensoes_por_hierarquia
             //foram declaradas no comeco da main porque o C da problema se declarar variavel no
             //meio do switch
             //Isso eh um exemplo de como varrer a matriz de hierarquias. Esse caso imprime a matriz
+            /*
             hierarquias = gera_hierarquias(dims, &quantidade_hierarquias, &quantidade_dimensoes_por_hierarquia);
             for(i=0; i < quantidade_hierarquias; i++) {
                 printf("hierarquia [%d]: ", i);
                 for(j = 0; j < quantidade_dimensoes_por_hierarquia[i]; j++) {
-                    printf("%d ", hierarquias[i][j]);
+                    char aux[2] = {dims.lista_dimensoes[(hierarquias[0][0])].sigla, '\0'};
+                    printf("%s %d %d", aux, i, j);
                 }
                 printf("\n");
+            }*/
+
+            //versao sem combinacao (teste)
+            int i, j;
+            //insere vertices
+            for(i = 0; i < quantidade_hierarquias; i++){
+                for(j = 0; j < *quantidade_dimensoes_por_hierarquia; j++){
+                    char *aux = &(dims.lista_dimensoes[(hierarquias[i][j])].sigla);
+                    insere_vertice(g, aux);
+                    printf("%s \n", aux);
+                }
             }
-            /*codigo_dot = gera_codigo_dot(g);
+            //liga hierarquias
+            for(i = 0; i < quantidade_hierarquias; i++){
+                for(j = 0; j < *quantidade_dimensoes_por_hierarquia; j++){
+                    char *aux = &(dims.lista_dimensoes[(hierarquias[i][j])].sigla);
+                    char *auxp = &(dims.lista_dimensoes[(hierarquias[i][j + 1])].sigla);
+                    insere_aresta_por_valor(g, aux, auxp);
+                    printf("%s \t %s \n", aux, auxp);
+                }
+            }
+
+            //insere_vertices_agregados(g, dims, hierarquias, &quantidade_hierarquias, &quantidade_dimensoes_por_hierarquia);
+            codigo_dot = gera_codigo_dot(g);
             grava_codigo_dot_em_arquivo(codigo_dot);
             printf("Foi gerado o arquivo grafo.dot com o codigo para gerar a visualizacao do grafo.\n");
 
@@ -143,26 +183,78 @@ int main() {
                 printf("Visualizacao gerada. Verificar o arquivo grafo.png.\n\n");
             } else {
                 printf("Foi digitado 'n' ou algum caracter invalido, portanto a visualizacao nao sera gerada.\n\n");
-            }*/
-
+            }
             //gera_grafo_derivacao(dims);
             break;
         case 7://grava os dados em um arquivo
+            system("clear");
             grava_dados_arquivo(dims);
             break;
         case 8://carrega os dados de um arquivo
+            system("clear");
             dims = *carrega_dados_arquivo();
             break;
         case 9://sai do programa
             exit(0);
             break;
         default://digitou um valor que nao eh uma opcao do menu
+            system("clear");
             printf("\n Opcao invalida.\n");
             break;
         }
     }
     return 0;
 }
+
+
+void insere_vertices_agregados(grafo *g, dimensoes dims,int **hier, int *qtd_h, int **qtd_dim_h){
+    //versao sem combinacao (teste)
+    int i, j;
+    //insere vertices
+    for(i = 0; i < *qtd_h; i++){
+        for(j = 0; j < **qtd_dim_h - 1; j++){
+            char aux[2] = {dims.lista_dimensoes[(hier[i][j])].sigla, '\0'};
+            insere_vertice(g, aux);
+            printf("%s \n", aux);
+        }
+    }
+    //liga hierarquias
+    for(i = 0; i < *qtd_h; i++){
+        for(j = 0; j < **qtd_dim_h; j++){
+            char aux[2] = {dims.lista_dimensoes[(hier[i][j])].sigla, '\0'};
+            char auxp[2] = {dims.lista_dimensoes[(hier[i][j + 1])].sigla, '\0'};
+            insere_aresta_por_valor(g, aux, auxp);
+            printf("%s \t %s \n", aux, auxp);
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 int **gera_hierarquias(dimensoes dims, int *quantidade_hier, int **qtd_dimensoes_por_hier) {
     int i = 0, j = 0;
