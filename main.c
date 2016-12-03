@@ -75,25 +75,21 @@ int main() {
 
         switch(opcao_menu) {
         case 1://cadastrando nova dimensao
-            system("clear");
             dims.qtd_dimensoes++;
             dims.lista_dimensoes = realloc(dims.lista_dimensoes, sizeof(dimensao)*dims.qtd_dimensoes);
             dims.lista_dimensoes[dims.qtd_dimensoes-1] = le_nova_dimensao();
             exibe_dimensoes(dims);
             break;
         case 2://cadastrando novo atributo para uma dimensao
-            system("clear");
             opcao_dimensao = escolhe_dimensao(dims);
             dims.lista_dimensoes[opcao_dimensao] =
             *acrescenta_atributo_numa_dimensao(&(dims.lista_dimensoes[opcao_dimensao]));
             exibe_dimensoes(dims);
             break;
         case 3://exibindo dimensoes cadastradas
-            system("clear");
             exibe_dimensoes(dims);
             break;
         case 4://configura uma dimensao como uma agregacao de outra dimensao
-            system("clear");
             exibe_dimensoes(dims);
             printf("Escolha o ancestral: ");
             scanf("%d", &ancestral);
@@ -108,11 +104,9 @@ int main() {
             exibe_dimensoes_com_agregacoes(dims);
             break;
         case 5://exibe as dimensoes e suas agregacoes
-            system("clear");
             exibe_dimensoes_com_agregacoes(dims);
             break;
         case 6://constroi e exibe o grafo de derivacao
-            system("clear");
             g = cria_grafo();
             
             //aqui funciona!!!
@@ -140,47 +134,24 @@ int main() {
             //Isso eh um exemplo de como varrer a matriz de hierarquias. Esse caso imprime a matriz
             
             hierarquias = gera_hierarquias(dims, &quantidade_hierarquias, &quantidade_dimensoes_por_hierarquia);
+            char aux[2];
             for(i=0; i < quantidade_hierarquias; i++) {
-                printf("hierarquia [%d]: ", i);
                 for(j = 0; j < quantidade_dimensoes_por_hierarquia[i]; j++) {
-                    char aux[2] = {dims.lista_dimensoes[(hierarquias[i][j])].sigla, '\0'};
+                    
+                    aux[0] = dims.lista_dimensoes[(hierarquias[i][j])].sigla;
+                    aux[1] = '\0';
                     insere_vertice(g, aux);
-                    printf("%s ", aux);
+                    
                 }
-                printf("\n");
+                printf("%s %d %d \n", aux, quantidade_hierarquias, quantidade_dimensoes_por_hierarquia[i]);
+                printf("saiu do J\n");
+            }
+            //repete a ultima dimensao... pq?
+            imprime_grafo(g);
+            for(i = 0; i < quantidade_hierarquias - 1; i++){
+                insere_aresta_por_numero(g, i, i + 1);
             }
 
-            for(i=0; i < quantidade_hierarquias; i++) {
-                printf("hierarquia [%d]: ", i);
-                for(j = 0; j < quantidade_dimensoes_por_hierarquia[i] - 1; j++) {
-                    char aux[2] = {dims.lista_dimensoes[(hierarquias[i][j])].sigla, '\0'};
-                    char ax[2] = {dims.lista_dimensoes[(hierarquias[i][j + 1])].sigla, '\0'};
-                    insere_aresta_por_valor(g, aux, ax);
-                    printf("%s %s", aux, ax);
-                }
-                printf("\n");
-            }
-            /*
-            //versao sem combinacao (teste)
-            int i, j;
-            //insere vertices
-            for(i = 0; i < quantidade_hierarquias; i++){
-                for(j = 0; j < *quantidade_dimensoes_por_hierarquia; j++){
-                    char *aux = &(dims.lista_dimensoes[(hierarquias[i][j])].sigla);
-                    insere_vertice(g, aux);
-                    printf("%s \n", aux);
-                }
-            }
-            //liga hierarquias
-            for(i = 0; i < quantidade_hierarquias; i++){
-                for(j = 0; j < *quantidade_dimensoes_por_hierarquia; j++){
-                    char *aux = &(dims.lista_dimensoes[(hierarquias[i][j])].sigla);
-                    char *auxp = &(dims.lista_dimensoes[(hierarquias[i][j + 1])].sigla);
-                    insere_aresta_por_valor(g, aux, auxp);
-                    printf("%s \t %s \n", aux, auxp);
-                }
-            }
-            */
             //insere_vertices_agregados(g, dims, hierarquias, &quantidade_hierarquias, &quantidade_dimensoes_por_hierarquia);
             codigo_dot = gera_codigo_dot(g);
             grava_codigo_dot_em_arquivo(codigo_dot);
@@ -198,20 +169,18 @@ int main() {
                 printf("Foi digitado 'n' ou algum caracter invalido, portanto a visualizacao nao sera gerada.\n\n");
             }
             //gera_grafo_derivacao(dims);
+
             break;
         case 7://grava os dados em um arquivo
-            system("clear");
             grava_dados_arquivo(dims);
             break;
         case 8://carrega os dados de um arquivo
-            system("clear");
             dims = *carrega_dados_arquivo();
             break;
         case 9://sai do programa
             exit(0);
             break;
         default://digitou um valor que nao eh uma opcao do menu
-            system("clear");
             printf("\n Opcao invalida.\n");
             break;
         }
