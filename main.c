@@ -117,6 +117,7 @@ int main() {
             
             //aqui funciona!!!
             /*
+            insere_vertice(g, "a");
             insere_vertice(g, "b");
             insere_vertice(g, "c");
             insere_vertice(g, "d");
@@ -140,11 +141,22 @@ int main() {
             
             hierarquias = gera_hierarquias(dims, &quantidade_hierarquias, &quantidade_dimensoes_por_hierarquia);
             for(i=0; i < quantidade_hierarquias; i++) {
-                //printf("hierarquia [%d]: ", i);
+                printf("hierarquia [%d]: ", i);
                 for(j = 0; j < quantidade_dimensoes_por_hierarquia[i]; j++) {
                     char aux[2] = {dims.lista_dimensoes[(hierarquias[i][j])].sigla, '\0'};
                     insere_vertice(g, aux);
                     printf("%s ", aux);
+                }
+                printf("\n");
+            }
+
+            for(i=0; i < quantidade_hierarquias; i++) {
+                printf("hierarquia [%d]: ", i);
+                for(j = 0; j < quantidade_dimensoes_por_hierarquia[i] - 1; j++) {
+                    char aux[2] = {dims.lista_dimensoes[(hierarquias[i][j])].sigla, '\0'};
+                    char ax[2] = {dims.lista_dimensoes[(hierarquias[i][j + 1])].sigla, '\0'};
+                    insere_aresta_por_valor(g, aux, ax);
+                    printf("%s %s", aux, ax);
                 }
                 printf("\n");
             }
