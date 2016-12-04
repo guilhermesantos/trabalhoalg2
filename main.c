@@ -46,9 +46,8 @@ void grava_codigo_dot_em_arquivo(char *codigo_dot);
 int **gera_hierarquias(dimensoes dims, int *quantidade_hier, int **qtd_dimensoes_por_hier);
 int *descobre_hierarquia(dimensoes *dims, int indice_dim, int **hierarquia_dimensao,
                          int *qtd_agregacoes_hierarquia);
-
-void insere_vertices_agregados(grafo *g, dimensoes dim,int **hier, int *qtd_h, int **qtd_dim_h);
-void insere_vertices_agregados_recursao(dimensoes *dims, int indice_dimensao, int primeiro);
+grafo *insere_vertices_agregados(dimensoes dims,int **hierarquias, int quantidade_hierarquias,
+                                int *quantidade_dimensoes_por_hierarquia);
 
 int main() {
     int opcao_menu = 0;
@@ -107,54 +106,18 @@ int main() {
             exibe_dimensoes_com_agregacoes(dims);
             break;
         case 6://constroi e exibe o grafo de derivacao
-            g = cria_grafo();
             
-            //aqui funciona!!!
-            /*
-            insere_vertice(g, "a");
-            insere_vertice(g, "a");
-            insere_vertice(g, "c");
-            insere_vertice(g, "d");
-            insere_vertice(g, "e");
-            insere_vertice(g, "f");
-            insere_vertice(g, "g");
-
-            insere_aresta_por_valor(g, "a", "a");
-            insere_aresta_por_valor(g, "a", "c");
-            insere_aresta_por_valor(g, "c", "d");
-            insere_aresta_por_valor(g, "c", "e");
-            insere_aresta_por_valor(g, "e", "f");
-            insere_aresta_por_valor(g, "e", "g");
-            insere_aresta_por_valor(g, "f", "f");
-            */
-
-            //hierarquias, quantidade_hierarquias e quantidade_dimensoes_por_hierarquia
-            //foram declaradas no comeco da main porque o C da problema se declarar variavel no
-            //meio do switch
-            //Isso eh um exemplo de como varrer a matriz de hierarquias. Esse caso imprime a matriz
-            /*
+            //NAO MEXER
+            //A hierarquias é usada pra navegar, nao pode ser alterada depois!
             hierarquias = gera_hierarquias(dims, &quantidade_hierarquias, &quantidade_dimensoes_por_hierarquia);
-            char entrada[2];
-            for(i=0; i < quantidade_hierarquias; i++) {
-                for(j = 0; j < quantidade_dimensoes_por_hierarquia[i]; j++) {
-                    entrada[0] = dims.lista_dimensoes[(hierarquias[i][j])].sigla;
-                    entrada[1] = '\0';
-                    insere_vertice(g, entrada);
-                }
-                entrada[0] = dims.lista_dimensoes[(hierarquias[i][j])].sigla;
-                entrada[1] = '\0';
-                //insere_aresta_por_numero(g, 0, 1);
-            }*/
-            //repete a ultima dimensao... pq?
-            insere_vertice(g, "t");
-            insere_vertice(g, "d");
-            imprime_grafo(g);
 
-            //insere_vertices_agregados(g, dims, hierarquias, &quantidade_hierarquias, &quantidade_dimensoes_por_hierarquia);
+            //chama funcao de fora pra nao ficar bagunçado
+            g = insere_vertices_agregados(dims, hierarquias, quantidade_hierarquias, quantidade_dimensoes_por_hierarquia);
+
+            imprime_grafo(g);
             codigo_dot = gera_codigo_dot(g);
             grava_codigo_dot_em_arquivo(codigo_dot);
             printf("Foi gerado o arquivo grafo.dot com o codigo para gerar a visualizacao do grafo.\n");
-
             printf("Se tiver o graphviz instalado, E REGISTRADO NA VARIAVEL DE AMBIENTE PATH,\n");
             printf("eh possivel gerar o arquivo de visualizacao do grafo.\n");
             printf("Gerar visualizacao? s/n: ");
@@ -187,52 +150,36 @@ int main() {
 }
 
 
-void insere_vertices_agregados(grafo *g, dimensoes dims,int **hier, int *qtd_h, int **qtd_dim_h){
+grafo *insere_vertices_agregados(dimensoes dims, int **hierarquias, int quantidade_hierarquias, int *quantidade_dimensoes_por_hierarquia){
     //versao sem combinacao (teste)
     int i, j;
-    //insere vertices
-    for(i = 0; i < *qtd_h; i++){
-        for(j = 0; j < **qtd_dim_h - 1; j++){
-            char aux[2] = {dims.lista_dimensoes[(hier[i][j])].sigla, '\0'};
-            insere_vertice(g, aux);
-            printf("%s \n", aux);
+    grafo *g = cria_grafo();
+    char *todas_siglas = malloc(quantidade_hierarquias * sizeof(char));
+    todas_siglas[quantidade_hierarquias - 1] = '\0';
+
+    //so monta por hierarquia...
+    for(i=0; i < quantidade_hierarquias; i++) {
+        for(j = 0; j < quantidade_dimensoes_por_hierarquia[i]; j++) {
+            char *entrada = malloc(2 * sizeof(char));
+            entrada[0] = dims.lista_dimensoes[(hierarquias[i][j])].sigla;
+            entrada[1] = '\0';
+            insere_vertice(g, entrada);
+            if(j > 0){
+                insere_aresta_por_numero(g, hierarquias[i][j - 1], hierarquias[i][j]);
+            }
         }
     }
-    //liga hierarquias
-    for(i = 0; i < *qtd_h; i++){
-        for(j = 0; j < **qtd_dim_h; j++){
-            char aux[2] = {dims.lista_dimensoes[(hier[i][j])].sigla, '\0'};
-            char auxp[2] = {dims.lista_dimensoes[(hier[i][j + 1])].sigla, '\0'};
-            insere_aresta_por_valor(g, aux, auxp);
-            printf("%s \t %s \n", aux, auxp);
-        }
+    //NAO MEXER
+    //Esse for coloca o vazio no final, deve SEMPRE ser o ultimo a ser executado =D
+    for(i = 0; i < quantidade_hierarquias; i++){
+        char *entrada = malloc(2 * sizeof(char));
+        entrada[0] = dims.lista_dimensoes[(hierarquias[i][quantidade_dimensoes_por_hierarquia[i] - 1])].sigla;
+        entrada[1] = '\0';
+        insere_vertice(g, "vazio");
+        insere_aresta_por_valor(g, entrada, "vazio");
     }
+    return g;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
