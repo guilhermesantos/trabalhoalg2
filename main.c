@@ -112,14 +112,14 @@ int main() {
             //aqui funciona!!!
             /*
             insere_vertice(g, "a");
-            insere_vertice(g, "b");
+            insere_vertice(g, "a");
             insere_vertice(g, "c");
             insere_vertice(g, "d");
             insere_vertice(g, "e");
             insere_vertice(g, "f");
             insere_vertice(g, "g");
 
-            insere_aresta_por_valor(g, "a", "b");
+            insere_aresta_por_valor(g, "a", "a");
             insere_aresta_por_valor(g, "a", "c");
             insere_aresta_por_valor(g, "c", "d");
             insere_aresta_por_valor(g, "c", "e");
@@ -132,25 +132,23 @@ int main() {
             //foram declaradas no comeco da main porque o C da problema se declarar variavel no
             //meio do switch
             //Isso eh um exemplo de como varrer a matriz de hierarquias. Esse caso imprime a matriz
-            
+            /*
             hierarquias = gera_hierarquias(dims, &quantidade_hierarquias, &quantidade_dimensoes_por_hierarquia);
-            char aux[2];
+            char entrada[2];
             for(i=0; i < quantidade_hierarquias; i++) {
                 for(j = 0; j < quantidade_dimensoes_por_hierarquia[i]; j++) {
-                    
-                    aux[0] = dims.lista_dimensoes[(hierarquias[i][j])].sigla;
-                    aux[1] = '\0';
-                    insere_vertice(g, aux);
-                    
+                    entrada[0] = dims.lista_dimensoes[(hierarquias[i][j])].sigla;
+                    entrada[1] = '\0';
+                    insere_vertice(g, entrada);
                 }
-                printf("%s %d %d \n", aux, quantidade_hierarquias, quantidade_dimensoes_por_hierarquia[i]);
-                printf("saiu do J\n");
-            }
+                entrada[0] = dims.lista_dimensoes[(hierarquias[i][j])].sigla;
+                entrada[1] = '\0';
+                //insere_aresta_por_numero(g, 0, 1);
+            }*/
             //repete a ultima dimensao... pq?
+            insere_vertice(g, "t");
+            insere_vertice(g, "d");
             imprime_grafo(g);
-            for(i = 0; i < quantidade_hierarquias - 1; i++){
-                insere_aresta_por_numero(g, i, i + 1);
-            }
 
             //insere_vertices_agregados(g, dims, hierarquias, &quantidade_hierarquias, &quantidade_dimensoes_por_hierarquia);
             codigo_dot = gera_codigo_dot(g);

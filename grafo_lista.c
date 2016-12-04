@@ -17,6 +17,7 @@ grafo *insere_vertice(grafo *g, char *val) {
     g->vertices[g->qtd_vertices-1].valor = val;
     g->vertices[g->qtd_vertices-1].qtd_adj = 0;
     g->vertices[g->qtd_vertices-1].lista_adj = NULL;
+    printf("\n\nInserido: %s\n\n", val);
     return g;
 }
 
