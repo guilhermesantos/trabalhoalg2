@@ -76,6 +76,7 @@ int main() {
 
         switch(opcao_menu) {
         case 1://cadastrando nova dimensao
+            printf("! Insira sempre o ancestral antes !\n");
             dims.qtd_dimensoes++;
             dims.lista_dimensoes = realloc(dims.lista_dimensoes, sizeof(dimensao)*dims.qtd_dimensoes);
             dims.lista_dimensoes[dims.qtd_dimensoes-1] = le_nova_dimensao();
@@ -108,6 +109,10 @@ int main() {
             exibe_dimensoes_com_agregacoes(dims);
             break;
         case 6://constroi e exibe o grafo de derivacao
+            if(dims.quantidade_hierarquias > 2){
+                printf("! Nao pode usar mais que duas Hierarquias !\n");
+                break;
+            }
             
             //NAO MEXER
             //A hierarquias é usada pra navegar, nao pode ser alterada depois!
@@ -173,65 +178,73 @@ grafo *insere_vertices_agregados(dimensoes dims, int **hierarquias, int quantida
     }
     
     for(i = 0; i < quantidade_dimensoes_por_hierarquia[0]; i++){
-
         for(j = 0; j < quantidade_dimensoes_por_hierarquia[1]; j++){
             if((j == quantidade_dimensoes_por_hierarquia[1] - 1) && (i == quantidade_dimensoes_por_hierarquia[0] - 1)){
+                //esta na ponta
                 char *auXx = malloc(3 * sizeof(char));
-                auXx[0] = dims.lista_dimensoes[hierarquias[0][j]].sigla;
-                auXx[1] = dims.lista_dimensoes[hierarquias[1][i]].sigla;
+                auXx[0] = dims.lista_dimensoes[hierarquias[0][i]].sigla;
+                auXx[1] = dims.lista_dimensoes[hierarquias[1][j]].sigla;
                 auXx[2] = '\0';
+                insere_vertice(g, auXx);
                 char *auxRr = malloc(2 * sizeof(char));
-                auxRr[0] = dims.lista_dimensoes[hierarquias[1][i]].sigla;
-                auxRr[1] = '\0';
-                insere_aresta_por_valor(g, auXx, auxRr);
-                char *auxDd = malloc(2 * sizeof(char));
-                auxDd[0] = dims.lista_dimensoes[hierarquias[0][j]].sigla;
-                auxDd[1] = '\0';
-                insere_aresta_por_valor(g, auXx, auxDd);
-            }else if(j == quantidade_dimensoes_por_hierarquia[1] - 1){
-                char *auXx = malloc(3 * sizeof(char));
-                auXx[0] = dims.lista_dimensoes[hierarquias[0][j]].sigla;
-                auXx[1] = dims.lista_dimensoes[hierarquias[1][i]].sigla;
-                auXx[2] = '\0';
-                char *auxRr = malloc(2 * sizeof(char));
-                auxRr[0] = dims.lista_dimensoes[hierarquias[1][i]].sigla;
+                auxRr[0] = dims.lista_dimensoes[hierarquias[1][j]].sigla;
                 auxRr[1] = '\0';
                 insere_vertice(g, auxRr);
                 insere_aresta_por_valor(g, auXx, auxRr);
-                char *auxDd = malloc(3 * sizeof(char));
-                auxDd[0] = dims.lista_dimensoes[hierarquias[0][j]].sigla;
-                auxDd[1] = dims.lista_dimensoes[hierarquias[1][i + 1]].sigla;
-                auxDd[2] = '\0';
+                char *auxDd = malloc(2 * sizeof(char));
+                auxDd[0] = dims.lista_dimensoes[hierarquias[0][i]].sigla;
+                auxDd[1] = '\0';
                 insere_vertice(g, auxDd);
                 insere_aresta_por_valor(g, auXx, auxDd);
-            }else if(i == quantidade_dimensoes_por_hierarquia[0] - 1){
+            }else if(j == quantidade_dimensoes_por_hierarquia[1] - 1){
+                //esta na extrema abaixo
                 char *auXx = malloc(3 * sizeof(char));
-                auXx[0] = dims.lista_dimensoes[hierarquias[0][j]].sigla;
-                auXx[1] = dims.lista_dimensoes[hierarquias[1][i]].sigla;
+                auXx[0] = dims.lista_dimensoes[hierarquias[0][i]].sigla;
+                auXx[1] = dims.lista_dimensoes[hierarquias[1][j]].sigla;
                 auXx[2] = '\0';
+                insere_vertice(g, auXx);
                 char *auxDd = malloc(2 * sizeof(char));
-                auxDd[0] = dims.lista_dimensoes[hierarquias[0][j]].sigla;
+                auxDd[0] = dims.lista_dimensoes[hierarquias[0][i]].sigla;
                 auxDd[1] = '\0';
                 insere_vertice(g, auxDd);
                 insere_aresta_por_valor(g, auXx, auxDd);
                 char *auxRr = malloc(3 * sizeof(char));
-                auxRr[0] = dims.lista_dimensoes[hierarquias[0][j + 1]].sigla;
-                auxRr[1] = dims.lista_dimensoes[hierarquias[1][i]].sigla;
+                auxRr[0] = dims.lista_dimensoes[hierarquias[0][i + 1]].sigla;
+                auxRr[1] = dims.lista_dimensoes[hierarquias[1][j]].sigla;
                 auxRr[2] = '\0';
                 insere_vertice(g, auxRr);
                 insere_aresta_por_valor(g, auXx, auxRr);
-            }else{
+            }else if(i == quantidade_dimensoes_por_hierarquia[0] - 1){
+                //esta na extrema direita
+                char *auXx = malloc(3 * sizeof(char));
+                auXx[0] = dims.lista_dimensoes[hierarquias[0][i]].sigla;
+                auXx[1] = dims.lista_dimensoes[hierarquias[1][j]].sigla;
+                auXx[2] = '\0';
+                insere_vertice(g, auXx);
+                char *auxRr = malloc(2 * sizeof(char));
+                auxRr[0] = dims.lista_dimensoes[hierarquias[1][j]].sigla;
+                auxRr[1] = '\0';
+                insere_vertice(g, auxRr);
+                insere_aresta_por_valor(g, auXx, auxRr);
+                char *auxDd = malloc(3 * sizeof(char));
+                auxDd[0] = dims.lista_dimensoes[hierarquias[0][i]].sigla;
+                auxDd[1] = dims.lista_dimensoes[hierarquias[1][j + 1]].sigla;
+                auxDd[2] = '\0';
+                insere_vertice(g, auxDd);
+                insere_aresta_por_valor(g, auXx, auxDd);
+            }else if((j < quantidade_dimensoes_por_hierarquia[1]) && (i < quantidade_dimensoes_por_hierarquia[0])){
+                //meio
                 char *aux = malloc(3 * sizeof(char));
-                aux[0] = dims.lista_dimensoes[hierarquias[0][j]].sigla;
-                aux[1] = dims.lista_dimensoes[hierarquias[1][i]].sigla;
+                aux[0] = dims.lista_dimensoes[hierarquias[0][i]].sigla;
+                aux[1] = dims.lista_dimensoes[hierarquias[1][j]].sigla;
                 aux[2] = '\0';
                 char *auxR = malloc(3 * sizeof(char));
-                auxR[0] = dims.lista_dimensoes[hierarquias[0][j + 1]].sigla;
-                auxR[1] = dims.lista_dimensoes[hierarquias[1][i]].sigla;
+                auxR[0] = dims.lista_dimensoes[hierarquias[0][i + 1]].sigla;
+                auxR[1] = dims.lista_dimensoes[hierarquias[1][j]].sigla;
                 auxR[2] = '\0';
                 char *auxD = malloc(3 * sizeof(char));
-                auxD[0] = dims.lista_dimensoes[hierarquias[0][j]].sigla;
-                auxD[1] = dims.lista_dimensoes[hierarquias[1][i + 1]].sigla;
+                auxD[0] = dims.lista_dimensoes[hierarquias[0][i]].sigla;
+                auxD[1] = dims.lista_dimensoes[hierarquias[1][j + 1]].sigla;
                 auxD[2] = '\0';
                 insere_vertice(g, aux);
                 insere_vertice(g, auxR);
@@ -239,6 +252,7 @@ grafo *insere_vertices_agregados(dimensoes dims, int **hierarquias, int quantida
                 insere_aresta_por_valor(g, aux, auxR);
                 insere_aresta_por_valor(g, aux, auxD);
             }
+            //imprime_grafo(g);
         }
     }
 
