@@ -49,6 +49,8 @@ int *descobre_hierarquia(dimensoes *dims, int indice_dim, int **hierarquia_dimen
 grafo *insere_vertices_agregados(dimensoes dims,int **hierarquias, int quantidade_hierarquias,
                                 int *quantidade_dimensoes_por_hierarquia);
 
+char *concatena(char *entrada, dimensoes dims, int **hierarquias, int *quantidade_dimensoes_por_hierarquia, int quantidade_hierarquias, int i, int j);
+
 int main() {
     int opcao_menu = 0;
     int opcao_dimensao = 0;
@@ -152,12 +154,12 @@ int main() {
 
 grafo *insere_vertices_agregados(dimensoes dims, int **hierarquias, int quantidade_hierarquias, int *quantidade_dimensoes_por_hierarquia){
     //versao sem combinacao (teste)
-    int i, j;
+    int i, j, ii, jj;
     grafo *g = cria_grafo();
     char *todas_siglas = malloc(quantidade_hierarquias * sizeof(char));
     todas_siglas[quantidade_hierarquias - 1] = '\0';
 
-    //so monta por hierarquia...
+    //So monta por hierarquia...
     for(i=0; i < quantidade_hierarquias; i++) {
         for(j = 0; j < quantidade_dimensoes_por_hierarquia[i]; j++) {
             char *entrada = malloc(2 * sizeof(char));
@@ -169,16 +171,65 @@ grafo *insere_vertices_agregados(dimensoes dims, int **hierarquias, int quantida
             }
         }
     }
+    char *bla2 = malloc(2 *sizeof(char));
+    bla2[0] = dims.lista_dimensoes[(hierarquias[0][0])].sigla;
+    bla2[1] = '\0';
+    char *aux2 = concatena(bla2, dims, hierarquias, quantidade_dimensoes_por_hierarquia, quantidade_hierarquias, 1, 0);
+    insere_vertice(g, aux2);
+
+        for(j = 0; j < quantidade_dimensoes_por_hierarquia[0]; j++){
+            char *bla = malloc(2 *sizeof(char));
+            bla[0] = dims.lista_dimensoes[(hierarquias[0][j])].sigla;
+            bla[1] = '\0';
+            for(ii = 0; ii < quantidade_dimensoes_por_hierarquia[1]; ii++){
+                char *aux = malloc(3 * sizeof(char));
+                aux = concatena(bla, dims, hierarquias, quantidade_dimensoes_por_hierarquia, quantidade_hierarquias, 1, ii);
+                aux[2] = '\0';
+                if((j == 0) && (ii == 0)) continue;
+                if((j > 0) && (ii > 0)){
+                    char *aux2 = malloc(3 *sizeof(char));
+                    aux2[0] = dims.lista_dimensoes[(hierarquias[0][j - 1])].sigla;
+                    aux2[1] = dims.lista_dimensoes[(hierarquias[1][j])].sigla;
+                    aux2[2] = '\0';
+                    insere_vertice(g, aux);
+                    insere_aresta_por_valor(g, aux2, aux);
+                    printf("%s %s\n", aux, aux2);
+                    char *aux3 = malloc(3 *sizeof(char));
+                    aux3[0] = dims.lista_dimensoes[(hierarquias[0][j])].sigla;
+                    aux3[1] = dims.lista_dimensoes[(hierarquias[1][j - 1])].sigla;
+                    aux3[2] = '\0';
+                    insere_aresta_por_valor(g, aux3, aux);
+                    printf("%s %s\n", aux, aux3);
+                }else{
+                    insere_vertice(g, aux);
+                    insere_aresta_por_valor(g, aux2, aux);
+                    printf("%s %s\n", aux, aux2);
+                }
+            }
+
+        }
+
     //NAO MEXER
     //Esse for coloca o vazio no final, deve SEMPRE ser o ultimo a ser executado =D
+    insere_vertice(g, "vazio");
     for(i = 0; i < quantidade_hierarquias; i++){
         char *entrada = malloc(2 * sizeof(char));
         entrada[0] = dims.lista_dimensoes[(hierarquias[i][quantidade_dimensoes_por_hierarquia[i] - 1])].sigla;
         entrada[1] = '\0';
-        insere_vertice(g, "vazio");
         insere_aresta_por_valor(g, entrada, "vazio");
     }
     return g;
+}
+
+//Adiciona uma caractere numa string qualquer.
+char *concatena(char *entrada, dimensoes dims, int **hierarquias, int *quantidade_dimensoes_por_hierarquia, int quantidade_hierarquias, int i, int j){
+    //tenta contatenar o vazio (j ultrapassa limite)
+    if(j >= quantidade_dimensoes_por_hierarquia[i]) return NULL;
+    if(i >= quantidade_hierarquias) return NULL;
+    char *saida = malloc((strlen(entrada) + 1) * sizeof(char));
+    strcpy(saida, entrada);
+    saida[strlen(entrada)] = dims.lista_dimensoes[(hierarquias[i][j])].sigla;
+    return saida;
 }
 
 
