@@ -12,6 +12,7 @@ grafo *cria_grafo() {
 }
 
 grafo *insere_vertice(grafo *g, char *val) {
+    if(busca_numero_do_vertice_por_valor(g, val) != -1) return g;
     g->qtd_vertices++;
     g->vertices = realloc(g->vertices, sizeof(vertice)*g->qtd_vertices);
     g->vertices[g->qtd_vertices-1].valor = val;
