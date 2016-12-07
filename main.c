@@ -239,7 +239,8 @@ grafo *insere_vertices_agregados(dimensoes dims, int **hierarquias, int quantida
     todas_siglas[quantidade_hierarquias - 1] = '\0';
 
     //Daqui ate o fim da funcao: realiza logica combinatoria para gerar todas os vertices para o grafo de derivacao
-    //Da maneira como esta implementado, infelizmente apenas funciona para 2 hierarquias
+    //Da maneira como esta implementado, infelizmente apenas funciona para 2 hierarquias que podem ter tamanhos iguais
+    //ou diferentes.
     for(i=0; i < quantidade_hierarquias; i++) {
         for(j = 0; j < quantidade_dimensoes_por_hierarquia[i]; j++) {
             char *entrada = malloc(2 * sizeof(char));
@@ -345,7 +346,7 @@ grafo *insere_vertices_agregados(dimensoes dims, int **hierarquias, int quantida
     return g;
 }
 
-//Adiciona uma caractere numa string qualquer.
+//Funcao utilitaria que concatena um caractere numa string qualquer.
 char *concatena(char *entrada, dimensoes dims, int **hierarquias, int *quantidade_dimensoes_por_hierarquia, int quantidade_hierarquias, int i, int j){
     //tenta contatenar o vazio (j ultrapassa limite)
     if(j >= quantidade_dimensoes_por_hierarquia[i]) return NULL;
@@ -357,7 +358,7 @@ char *concatena(char *entrada, dimensoes dims, int **hierarquias, int *quantidad
 }
 
 //Funcao utilitaria que gera a matriz de hierarquias utilizada para facilitar
-//a geracao do grafo de derivacao. Consiste numa chamada a uma busca de profundidade
+//a geracao do grafo de derivacao. Consiste numa chamada a uma busca recursiva
 //entre as structs dimensao, comecando pela primeira dimensao cadastrada e continua por todas
 //as suas agregacoes, pintando de preto as dimensoes encontradas.
 
@@ -370,8 +371,12 @@ int **gera_hierarquias(dimensoes dims, int *quantidade_hier, int **qtd_dimensoes
     int **hierarquias = NULL;
     int *qtd_dimensoes_por_hierarquia = NULL;
 
+    //Pinta todas as dimensoes de branco, a fim de posteriormente pinta-las de preto
+    //para marcar aquelas que ja foram contabilizadas
     pinta_todas_as_dimensoes(&dims, branco);
 
+    //Itera sobre todas as dimensoes, buscando recursivamente suas agregacoes e colocando na matriz de
+    //hierarquias
     for(i=0; i < dims.qtd_dimensoes; i++) {
         if(dims.lista_dimensoes[i].cor != preto) {
             qtd_hierarquias++;
@@ -393,11 +398,13 @@ int **gera_hierarquias(dimensoes dims, int *quantidade_hier, int **qtd_dimensoes
     return hierarquias;
 }
 
-//Funcao utilitaria que inverte um vetor de inteiros.
+//Funcao utilitaria que inverte um vetor de inteiros e substitui no
+//vetor referenciado pelo ponteiro enviado por argumento
 int *inverte_vetor(int **vetor, int qtd_elems) {
     int i;
     int j = qtd_elems-1;
     int *novo_vetor = malloc(sizeof(int)*qtd_elems);
+    //Itera sobre os elementos do vetor original
     for(i=0; i < qtd_elems; i++) {
         novo_vetor[j] = vetor[0][i];
         j--;
@@ -497,6 +504,7 @@ dimensoes *carrega_dados_arquivo() {
         fread(&(dim.qtd_atributos), sizeof(int), 1, f);
         dim.atributos = malloc(sizeof(atributo)*dim.qtd_atributos);
 
+        //Carrega e le cada um dos atributos
         for(j=0; j < dim.qtd_atributos; j++) {
             fread(&tam_atributo, sizeof(int), 1, f);
             dim.atributos[j] = malloc(sizeof(char)*tam_atributo);
@@ -514,6 +522,7 @@ dimensoes *carrega_dados_arquivo() {
 //da cor especificada no parametro c
 void pinta_todas_as_dimensoes(dimensoes *dims, cor c) {
     int i = 0;
+    //Itera sobre as dimensoes, pintando uma a uma
     for(i=0; i < dims->qtd_dimensoes; i++) {
         dims->lista_dimensoes[i].cor = c;
     }
@@ -542,22 +551,28 @@ void exibe_dimensoes_com_agregacoes(dimensoes dims) {
     printf("\n");
 }
 
-//Imprime uma única dimensao com todas suas agregacoes por meio de uma busca em profundidade
+//Imprime uma única dimensao com todas suas agregacoes por meio de uma busca recursiva
 void exibe_dimensao_com_agregacoes(dimensoes *dims, int indice_dimensao, int primeiro) {
+    //Encerra a busca em recursiva pra dimensao atual se a sua lista de agregacoes acabou
     if(dims->lista_dimensoes[indice_dimensao].cor == preto || indice_dimensao == -1) {
         return;
     }
+    //chamada recursiva
     exibe_dimensao_com_agregacoes(dims, dims->lista_dimensoes[indice_dimensao].agregacao, 0);
 
+    //imprime a dimensao atual
     printf("%s", dims->lista_dimensoes[indice_dimensao].nome);
     if(primeiro == 0) {
+        //se nao for a ultima dimensao da hierarquia, coloca um "<" pra separar as agregacoes
         printf(" < ");
     }
+    //pinta a dimensao atual de preto. usado pra contrlar as dimensoes pelas quais a busca ja passou
     dims->lista_dimensoes[indice_dimensao].cor = preto;
 
     return;
 }
 
+//Exibe todas as opcoes do menu
 void exibe_menu() {
     printf("Sistema de data warehousing\n");
     printf("1. Adicionar nova dimensao\n");
@@ -572,12 +587,15 @@ void exibe_menu() {
     printf("Opcao: ");
 }
 
+//Funcao utilitaria que manda o usuario escolher uma dimensao,
+//por meio dos numeros que a identifica na tela.
+//Usado no cadastro de atributos e de agregacoes.
 int escolhe_dimensao(dimensoes dims) {
     int opcao_dimensao = 0;
     exibe_dimensoes(dims);
     printf("\nEscolha a dimensao: ");
     scanf("%d", &opcao_dimensao);
-
+    //Valida se a opcao digitada nao eh maior do que o numero de dimensoes cadastradas
     if(opcao_dimensao > dims.qtd_dimensoes-1) {
         printf("Numero de dimensao invalido.\n");
     } else {
@@ -585,6 +603,8 @@ int escolhe_dimensao(dimensoes dims) {
     }
 }
 
+//Funcao que invoca o metodo que le um atributo e então coloca
+//esse atributo na lista de atributos da dimensao passada como argumento
 dimensao *acrescenta_atributo_numa_dimensao(dimensao *dim) {
     dim->qtd_atributos++;
     dim->atributos = realloc(dim->atributos, sizeof(atributo)*dim->qtd_atributos);
@@ -593,6 +613,8 @@ dimensao *acrescenta_atributo_numa_dimensao(dimensao *dim) {
     return dim;
 }
 
+//Funcao que pede para o usuario digita o nome de um novo atributo na tela.
+//Le esse atributo e retorna. Restricao: deve ter ate 50 caracteres.
 atributo le_atributo() {
     atributo novo_atributo = malloc(sizeof(char)*50);
     printf("Digite o atributo: ");
@@ -602,14 +624,19 @@ atributo le_atributo() {
     return novo_atributo;
 }
 
+//Exibe todas as dimensoes com seus atributos
 void exibe_dimensoes(dimensoes dims) {
     printf("\n=====================\n");
     printf("DIMENSOES CADASTRADAS\n");
     printf("=====================\n");
     if(dims.qtd_dimensoes == 0) {
+        //Caso em que nenhuma dimensao foi cadastrada
         printf("Nao ha dimensoes cadastradas.\n");
     } else {
+        //Caso em que ha dimensoes cadastradas.
         int i = 0;
+        //Itera sobre cada uma das dimensoes cadastradas,
+        //invocando a funcao que exibe uma unica dimensao com seus atributos
         for(i=0; i < dims.qtd_dimensoes; i++) {
             printf("%d\.", i);
             exibe_dimensao(dims.lista_dimensoes[i]);
@@ -618,15 +645,19 @@ void exibe_dimensoes(dimensoes dims) {
     printf("\n");
 }
 
+//Funcao que exibe a dimensao recebida por argumento, com todos seus atributos
 void exibe_dimensao(dimensao dim) {
     printf("%s", dim.nome);
     printf("(%c)\n", dim.sigla);
     int i;
+    //Itera sobre cada um dos atributos da dimensao
     for(i=0; i < dim.qtd_atributos; i++) {
         printf("    Atr.%d: %s\n", i, dim.atributos[i]);
     }
 }
 
+//Le da tela todos os atributos de uma dimensao, cria a dimensao com esses atributos e retorna
+//Usado no cadastro de uma nova dimensao
 dimensao le_nova_dimensao() {
     dimensao d;
     char *nome_dimensao = malloc(sizeof(char)*50);
