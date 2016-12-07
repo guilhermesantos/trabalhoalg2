@@ -238,7 +238,8 @@ grafo *insere_vertices_agregados(dimensoes dims, int **hierarquias, int quantida
     char *todas_siglas = malloc(quantidade_hierarquias * sizeof(char));
     todas_siglas[quantidade_hierarquias - 1] = '\0';
 
-    //So monta por hierarquia...
+    //Daqui ate o fim da funcao: realiza logica combinatoria para gerar todas os vertices para o grafo de derivacao
+    //Da maneira como esta implementado, infelizmente apenas funciona para 2 hierarquias
     for(i=0; i < quantidade_hierarquias; i++) {
         for(j = 0; j < quantidade_dimensoes_por_hierarquia[i]; j++) {
             char *entrada = malloc(2 * sizeof(char));
@@ -332,7 +333,7 @@ grafo *insere_vertices_agregados(dimensoes dims, int **hierarquias, int quantida
 
 
     //NAO MEXER
-    //Esse for coloca o vazio no final, deve SEMPRE ser o ultimo a ser executado =D
+    //Coloca a dimensao "Vazio" no final do grafo de derivacao
     insere_vertice(g, "vazio");
     for(i = 0; i < quantidade_hierarquias; i++){
         char *entrada = malloc(2 * sizeof(char));
@@ -355,8 +356,13 @@ char *concatena(char *entrada, dimensoes dims, int **hierarquias, int *quantidad
     return saida;
 }
 
+//Funcao utilitaria que gera a matriz de hierarquias utilizada para facilitar
+//a geracao do grafo de derivacao. Consiste numa chamada a uma busca de profundidade
+//entre as structs dimensao, comecando pela primeira dimensao cadastrada e continua por todas
+//as suas agregacoes, pintando de preto as dimensoes encontradas.
 
-
+//IMPORTANTE: Eh por causa dessa funcao que as dimensoes usadas como ancestrais devem ser
+//cadastradas antes de seus descendentes.
 int **gera_hierarquias(dimensoes dims, int *quantidade_hier, int **qtd_dimensoes_por_hier) {
     int i = 0, j = 0;
 
@@ -387,6 +393,7 @@ int **gera_hierarquias(dimensoes dims, int *quantidade_hier, int **qtd_dimensoes
     return hierarquias;
 }
 
+//Funcao utilitaria que inverte um vetor de inteiros.
 int *inverte_vetor(int **vetor, int qtd_elems) {
     int i;
     int j = qtd_elems-1;
@@ -402,6 +409,8 @@ int *inverte_vetor(int **vetor, int qtd_elems) {
     return vetor[0];
 }
 
+//Funcao recursiva que faz parte da busca em profundidade que gera
+//a matriz de hierarquias.
 int *descobre_hierarquia(dimensoes *dims, int indice_dim, int **hierarquia_dimensao,
                          int *qtd_agregacoes_hierarquia) {
     if(indice_dim == -1 || dims->lista_dimensoes[indice_dim].cor == preto) {
@@ -417,6 +426,8 @@ int *descobre_hierarquia(dimensoes *dims, int indice_dim, int **hierarquia_dimen
     return hierarquia_dimensao[0];
 }
 
+//Recebe uma string contendo o codigo dot (linguagem do graphviz)
+//e escreve em um arquivo.
 void grava_codigo_dot_em_arquivo(char *codigo_dot) {
     FILE *f = fopen("grafo.dot", "w");
     if(f == NULL) {
@@ -428,8 +439,10 @@ void grava_codigo_dot_em_arquivo(char *codigo_dot) {
     printf("Foi gerado o arquivo grafo.dot com a visualizacao do grafo criado.\n\n");
 }
 
+//Grava todas as dimensoes e hierarquias cadastradas em um arquivo binario.
 void grava_dados_arquivo(dimensoes dims) {
     FILE *f = fopen("dimensoes.dat", "wb");
+    //Se nao conseguiu criar o arquivo, significa que houve um problema.
     if(f == NULL) {
         printf("Erro. O arquivo especificado nao pode ser criado.\n");
         return;
@@ -437,7 +450,7 @@ void grava_dados_arquivo(dimensoes dims) {
     fwrite(&(dims.qtd_dimensoes), sizeof(int), 1, f);
     int i, j, tam_nome, tam_atributo, cor;
 
-
+    //Varre as dimensoes e cadastra uma a uma
     for(i=0; i < dims.qtd_dimensoes; i++) {
         fwrite(&(dims.lista_dimensoes[i].sigla), sizeof(char), 1, f);
         tam_nome = strlen(dims.lista_dimensoes[i].nome)+1;
@@ -457,9 +470,11 @@ void grava_dados_arquivo(dimensoes dims) {
     fclose(f);
 }
 
+//Procura o arquivo binario com dados de dimensoes e hierarquias e o carrega
 dimensoes *carrega_dados_arquivo() {
     dimensoes dims;
     FILE *f = fopen("dimensoes.dat", "rb");
+    //Se nao conseguiu abrir o arquivo, signfica que ele nao existe ou houve algum outro problema.
     if(f == NULL) {
         printf("O arquivo especificado nao existe ou nao pode ser aberto.\n");
 
@@ -470,6 +485,7 @@ dimensoes *carrega_dados_arquivo() {
 
     int i, j, k = 0, tam_nome = 0, tam_atributo = 0;
 
+    //Carrega e le cada uma das dimensoes cadastradas
     for(i = 0; i < dims.qtd_dimensoes; i++) {
         dimensao dim;
         dim.nome = NULL;
@@ -494,6 +510,8 @@ dimensoes *carrega_dados_arquivo() {
     return &dims;
 }
 
+//Funcao utilitaria usada na busca em profundidade. Pinta todas as dimensoes
+//da cor especificada no parametro c
 void pinta_todas_as_dimensoes(dimensoes *dims, cor c) {
     int i = 0;
     for(i=0; i < dims->qtd_dimensoes; i++) {
@@ -501,15 +519,21 @@ void pinta_todas_as_dimensoes(dimensoes *dims, cor c) {
     }
 }
 
+//Exibe todas as dimensoes com suas agregacoes. Para isso, realiza uma busca em profundidade
+//para cada dimensao
 void exibe_dimensoes_com_agregacoes(dimensoes dims) {
     printf("\n=====================\n");
     printf("AGREGACOES CADASTRADAS\n");
     printf("=====================\n");
     if(dims.qtd_dimensoes == 0) {
+    //Usuario ainda nao cadastrou nada
         printf("Nao ha dimensoes cadastradas.\n");
     } else {
+        //Usuario ja cadastrou alguma dimensao
         int i = 0;
         pinta_todas_as_dimensoes(&dims, branco);
+        //Varre todas as dimensoes e imprime uma a uma,
+        //chamando a funcao que imprime uma única dimensao
         for(i=0; i < dims.qtd_dimensoes; i++) {
             exibe_dimensao_com_agregacoes(&dims, i, 1);
             printf("\n");
@@ -518,6 +542,7 @@ void exibe_dimensoes_com_agregacoes(dimensoes dims) {
     printf("\n");
 }
 
+//Imprime uma única dimensao com todas suas agregacoes por meio de uma busca em profundidade
 void exibe_dimensao_com_agregacoes(dimensoes *dims, int indice_dimensao, int primeiro) {
     if(dims->lista_dimensoes[indice_dimensao].cor == preto || indice_dimensao == -1) {
         return;
