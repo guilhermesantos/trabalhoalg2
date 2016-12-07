@@ -3,13 +3,19 @@
 #include <string.h>
 #include "grafo_lista.h"
 
+//Tipo de dados criado para facilitar a representacao do atributo
+//de uma dimensao qualquer.
 typedef char* atributo;
 
+//Enum utilizada para armazenar as cores a serem utilizadas durante a busca em profundidade
 typedef enum cor {
     preto,
     branco,
 } cor;
 
+//Struct que armazena os dados das dimensoes. Sigla para o grafo de derivacao,
+//nome por extenso, quantidade de atributos cadastrados, atributos cadastrados, indice da dimensao
+//que serve como agregacao da dimensao atual, e cor (utilizado para busca em profundidade)
 typedef struct dimensao {
     char sigla;
     char *nome;
@@ -19,49 +25,105 @@ typedef struct dimensao {
     cor cor;
 } dimensao;
 
+//Estrutura para armazenar todas as dimensoes cadastradas. Guarda um vetor de dimensoes e
+//a quantidade de dimensoes ja cadastradas.
 typedef struct dimensoes {
     dimensao *lista_dimensoes;
     int qtd_dimensoes;
 } dimensoes;
 
-
+//Funcao utilitaria que inverte um vetor de inteiros
 int *inverte_vetor(int **vetor, int qtd_elems);
+
+//Funcao que imprime na tela as opcoes do menu
 void exibe_menu();
+
+//Funcao que imprime na tela todas as dimensoes cadastradas
 void exibe_dimensoes(dimensoes dims);
+
+//Funcao que imprime na tela uma unica dimensao (utilizada pela funcao que imprime todas as dimensoes)
 void exibe_dimensao(dimensao dim);
 
+//Funcao que pede ao usuario que digite os dados de uma nova dimensao,
+//le os dados, aloca uma nova dimensao e a retorna
 dimensao le_nova_dimensao();
+
+//Funcao que chama a funcao que le um novo atributo da tela, e então
+//coloca o atributo lido na dimensao escolhida para o atributo
 dimensao *acrescenta_atributo_numa_dimensao(dimensao *dim);
+
+//Funcao que pede que o usuario digite os dados do novo atributo e os lê.
+//Usada pela funcao acima, que coloca o atributo em uma dimensao.
 atributo le_atributo();
 
+//Funcao que pede que o usuario escolha uma dimensao. Eh utilizado por uma serie de funcoes,
+//como a que cadastra um novo atributo para uma dimensao, ou a que cadastra uma agregacao
 int escolhe_dimensao(dimensoes dims);
 
+//Exibe a hierarquia de agregacoes de uma dimensao
 void exibe_dimensao_com_agregacoes(dimensoes *dims, int indice_dimensao, int primeiro);
+
+//Exibe todas as hierarquias de agregacoes cadastradas no sistema
 void exibe_dimensoes_com_agregacoes(dimensoes dims);
 
+//Pinta todas as dimensoes da cor especificada no parametro c. usado para as buscas
 void pinta_todas_as_dimensoes(dimensoes *dims, cor c);
+
+//Grava todas as dimensoes em um arquivo binario chamado dimensoes.dat
 void grava_dados_arquivo(dimensoes dims);
+
+//Carrega todas as dimensoes de um arquivo binario chamado dimensoes.dat
 dimensoes *carrega_dados_arquivo();
+
+//Recebe o codigo dot (lingugem utilizada pelo graphviz para visualizacao de grafos)
+//e grava em um arquivo chamado grafo.dot
 void grava_codigo_dot_em_arquivo(char *codigo_dot);
+
+//Gera uma matriz com as hierarquias, estrutura de dados utilizada para tornar mais conveniente
+//a geracao do grafo de derivacao
 int **gera_hierarquias(dimensoes dims, int *quantidade_hier, int **qtd_dimensoes_por_hier);
+
+//Busca em profundidade utilizada para recuperar todas as hierarquias cadastradas.
+//IMPORTANTE: Para funcionar, foi necessario incluir uma restricao no programa.
+//As dimensoes ancestrais devem ser cadastradas ANTES das dimensoes descendentes.
 int *descobre_hierarquia(dimensoes *dims, int indice_dim, int **hierarquia_dimensao,
                          int *qtd_agregacoes_hierarquia);
+
+//Gera o grafo de derivacao a partir da matriz de hierarquias
 grafo *insere_vertices_agregados(dimensoes dims,int **hierarquias, int quantidade_hierarquias,
                                 int *quantidade_dimensoes_por_hierarquia);
 
+//Funcao utilitaria que concatena
 char *concatena(char *entrada, dimensoes dims, int **hierarquias, int *quantidade_dimensoes_por_hierarquia, int quantidade_hierarquias, int i, int j);
 
 int main() {
+    //Guarda a opcao do menu que usuario vai digitar
     int opcao_menu = 0;
+    //Guarda a dimensao que o usuario vai escolher nas opcoes pertinentes
     int opcao_dimensao = 0;
+    //Guarda o indice da dimensao que o usuario vai escolher como ancestral no cadastro de agregacoes
     int ancestral;
+    //Idem ao anterior, mas para a dimensao escolhia como descendente da agregacao
     int descendente;
+    //Indices de iteracao
     int i, j;
 
+    //Guarda a quantidade de hierarquias cadastradas. Variavel preenchida na busca em profundidade
+    //das hierarquias
     int quantidade_hierarquias;
+    //Vetor que guarda a quantidade de dimensoes em uma hierarquia
+    //Cada posicao do vetor guarda a quantidade de dimensoes da hierarquia correspondente
+    //Ex:[3][4][7]. A hierarquia 0 tem 3 dimensoes, a hierarquia 1 tem 4 dimensoes e a hierarquia 2 tem 7
+    //dimensoes.
     int *quantidade_dimensoes_por_hierarquia;
+
+    //Guarda as dimensoes em cada hierarquia de agregacoes
+    //ex: [0]3 1 2
+    //    [1]4 0 5
+    //A hierarquia 0 tem as dimensoes 3, 1 e 2. A hierarquia 1 tem as dimensoes 4, 0 e 5.
     int **hierarquias;
 
+    //Estrutura que guarda todas as dimensoes.
     dimensoes dims;
     dims.lista_dimensoes = NULL;
     dims.qtd_dimensoes = 0;
@@ -70,6 +132,7 @@ int main() {
     char *codigo_dot;
     char gera_visualizacao = 'n';
 
+    //Executa o programa enquanto o usuario nao digitar a opcao '9' (sair)
     while(opcao_menu != 9) {
         exibe_menu();
         scanf("%d", &opcao_menu);
@@ -110,30 +173,41 @@ int main() {
             break;
         case 6://constroi e exibe o grafo de derivacao
             if(dims.quantidade_hierarquias > 2){
-                printf("! Nao pode usar mais que duas Hierarquias !\n");
+                printf("ATENÇÃO. Foi necessario impor uma restrição de funcionalidade.s\n");
+                printf("A geracao do grafo de derivacao só é realizada por este programa\n");
+                printf("para ate 2 hierarquias, funcionando para 2 hierarquias de tamanho qualquer cada uma.\n");
+                printf("Dimensoes isoladas sao contadas como uma hierarquia. Por favor,\n");
+                printf("coloque as dimensoes isoladas em uma hierarquia. Se mesmo assim houver mais\n");
+                printf("de uma hierarquia, por favor reinicie o programa.\n");
                 break;
             }
-            
+
             //NAO MEXER
-            //A hierarquias é usada pra navegar, nao pode ser alterada depois!
+            //A hierarquias é uma matriz auxiliar, usada pra navegar entre as agregacoes cadastradas.
             hierarquias = gera_hierarquias(dims, &quantidade_hierarquias, &quantidade_dimensoes_por_hierarquia);
 
-            //chama funcao de fora pra nao ficar bagunçado
+            //Gera o gravo de derivacao e coloca no grafo g
             g = insere_vertices_agregados(dims, hierarquias, quantidade_hierarquias, quantidade_dimensoes_por_hierarquia);
 
-            
+            //Gera o codigo do graphviz com base no grafo de derivacao g
             codigo_dot = gera_codigo_dot(g);
+            //Grava o codigo do graphviz em um arquivo chamado grafo.dot
             grava_codigo_dot_em_arquivo(codigo_dot);
+
+            //Pergunta se deseja invocar o graphviz para gera a visualizacao do grafo a partir
+            //do codigo dot criado
             printf("Foi gerado o arquivo grafo.dot com o codigo para gerar a visualizacao do grafo.\n");
             printf("Se tiver o graphviz instalado, E REGISTRADO NA VARIAVEL DE AMBIENTE PATH,\n");
             printf("eh possivel gerar o arquivo de visualizacao do grafo.\n");
             printf("Gerar visualizacao? s/n: ");
             scanf(" %c", &gera_visualizacao);
             if(gera_visualizacao == 's') {
+                //gera visualizacao
                 printf("Gerando visualizacao...\n");
                 system("dot -Tpng grafo.dot -o grafo.png");
                 printf("Visualizacao gerada. Verificar o arquivo grafo.png.\n\n");
             } else {
+                //nao gera
                 printf("Foi digitado 'n' ou algum caracter invalido, portanto a visualizacao nao sera gerada.\n\n");
             }
             //gera_grafo_derivacao(dims);
@@ -156,9 +230,9 @@ int main() {
     return 0;
 }
 
-
+//Gera o grafo de derivacao a partir da matriz de hierarquias
 grafo *insere_vertices_agregados(dimensoes dims, int **hierarquias, int quantidade_hierarquias, int *quantidade_dimensoes_por_hierarquia){
-    //versao sem combinacao (teste)
+    //Coloca o primeiro vertice do grafo, que tem a sigla de todas as dimensoes concatenadas
     int i, j, ii, jj;
     grafo *g = cria_grafo();
     char *todas_siglas = malloc(quantidade_hierarquias * sizeof(char));
@@ -176,7 +250,7 @@ grafo *insere_vertices_agregados(dimensoes dims, int **hierarquias, int quantida
             }
         }
     }
-    
+
     for(i = 0; i < quantidade_dimensoes_por_hierarquia[0]; i++){
         for(j = 0; j < quantidade_dimensoes_por_hierarquia[1]; j++){
             if((j == quantidade_dimensoes_por_hierarquia[1] - 1) && (i == quantidade_dimensoes_por_hierarquia[0] - 1)){
