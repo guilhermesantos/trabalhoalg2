@@ -17,10 +17,17 @@ typedef enum cor {
 //nome por extenso, quantidade de atributos cadastrados, atributos cadastrados, indice da dimensao
 //que serve como agregacao da dimensao atual, e cor (utilizado para busca em profundidade)
 typedef struct dimensao {
+    //Sigla que sera utilizada no grafo de derivacao
     char sigla;
+    //Nome por extenso do atributo, usado para a impressao no terminal
     char *nome;
+    //quantidade de atributos cadastrados para dimensao. comeca com 0.
     int qtd_atributos;
+    //vetor de atributos. tem tamanho variavel.
     atributo *atributos;
+    //guarda o indice da dimensao que eh agregacao da dimensao representada por
+    //uma instancia dessa struct. comeca com -1 para indicar que ainda nao foi cadastrada
+    //uma agregacao
     int agregacao;
     cor cor;
 } dimensao;
