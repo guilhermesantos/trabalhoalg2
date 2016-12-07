@@ -181,7 +181,11 @@ int main() {
             exibe_dimensoes_com_agregacoes(dims);
             break;
         case 6://constroi e exibe o grafo de derivacao
-            if(dims.quantidade_hierarquias > 2){
+            //NAO MEXER
+            //A hierarquias é uma matriz auxiliar, usada pra navegar entre as agregacoes cadastradas.
+            hierarquias = gera_hierarquias(dims, &quantidade_hierarquias, &quantidade_dimensoes_por_hierarquia);
+
+            if(quantidade_hierarquias > 2){
                 printf("ATENÇÃO. Foi necessario impor uma restrição de funcionalidade.s\n");
                 printf("A geracao do grafo de derivacao só é realizada por este programa\n");
                 printf("para ate 2 hierarquias, funcionando para 2 hierarquias de tamanho qualquer cada uma.\n");
@@ -190,10 +194,6 @@ int main() {
                 printf("de uma hierarquia, por favor reinicie o programa.\n");
                 break;
             }
-
-            //NAO MEXER
-            //A hierarquias é uma matriz auxiliar, usada pra navegar entre as agregacoes cadastradas.
-            hierarquias = gera_hierarquias(dims, &quantidade_hierarquias, &quantidade_dimensoes_por_hierarquia);
 
             //Gera o gravo de derivacao e coloca no grafo g
             g = insere_vertices_agregados(dims, hierarquias, quantidade_hierarquias, quantidade_dimensoes_por_hierarquia);
