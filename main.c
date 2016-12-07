@@ -29,6 +29,8 @@ typedef struct dimensao {
     //uma instancia dessa struct. comeca com -1 para indicar que ainda nao foi cadastrada
     //uma agregacao
     int agregacao;
+    //campo cor usado para a busca recursiva identificar por quais lugares a busca
+    //ja passou.
     cor cor;
 } dimensao;
 
