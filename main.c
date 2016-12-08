@@ -213,6 +213,7 @@ int main() {
             if(gera_visualizacao == 's') {
                 //gera visualizacao
                 printf("Gerando visualizacao...\n");
+                //chamada pro graphviz. SO FUNCIONA SE O GRAPHVIZ ESTIVER NO PATH DO USUARIO!!!!!
                 system("dot -Tpng grafo.dot -o grafo.png");
                 printf("Visualizacao gerada. Verificar o arquivo grafo.png.\n\n");
             } else {
