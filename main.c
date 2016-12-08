@@ -202,7 +202,7 @@ int main() {
             if(quantidade_hierarquias > 2){
                 printf("ATENÇÃO. Foi necessario impor uma restrição de funcionalidade.s\n");
                 printf("A geracao do grafo de derivacao só é realizada por este programa\n");
-                printf("para ate 2 hierarquias, funcionando para 2 hierarquias de tamanho qualquer cada uma.\n");
+                printf("para ATE no maximo 2 hierarquias, funcionando para 2 hierarquias de tamanho qualquer cada uma.\n");
                 printf("Dimensoes isoladas sao contadas como uma hierarquia. Por favor,\n");
                 printf("coloque as dimensoes isoladas em uma hierarquia. Se mesmo assim houver mais\n");
                 printf("de uma hierarquia, por favor reinicie o programa.\n");
