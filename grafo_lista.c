@@ -116,6 +116,8 @@ char *gera_codigo_dot(grafo *g) {
 //Funcao utiliraria que recebe dois vertices e retorna uma string formatada
 //representando a aresta entre os dois. Utilizada pela funcao gera_codigo_dot.
 char *stringfica_aresta(vertice v1, vertice v2) {
+    //Concatena o valor dos dois vertices com um -> entre eles
+    //o -> indica uma aresta direcionada na linguagem do graphviz
     char *resultado = malloc(strlen(v1.valor)+strlen(" -> ")+strlen(v2.valor)+1);
     strcpy(resultado, v1.valor);
     strcat(resultado, " -> ");

@@ -134,21 +134,33 @@ int main() {
 
     //Estrutura que guarda todas as dimensoes.
     dimensoes dims;
+    //Coloca null na lista pra nao dar problema na alocacao do ponteiro depois
     dims.lista_dimensoes = NULL;
+    //Comeca com 0 dimensoes cadastradas
     dims.qtd_dimensoes = 0;
 
+    //Ponteiro pro grafo que eh gerado na visualizacao do grafo de derivacao
     grafo *g;
+
+    //Variavel que guarda o codigo dot que eh gerado na visualizacao do grafo de derivacao
+    //Essa string eh usada para gravar o codigo dot num arquivo
     char *codigo_dot;
+
+    //Eh oferecida a opcao do usuario
     char gera_visualizacao = 'n';
 
     //Executa o programa enquanto o usuario nao digitar a opcao '9' (sair)
     while(opcao_menu != 9) {
+        //Exibe as opcoes do menu na tela
         exibe_menu();
         scanf("%d", &opcao_menu);
 
+        //switch pra controle do menu
         switch(opcao_menu) {
         case 1://cadastrando nova dimensao
-            printf("! Insira sempre o ancestral antes !\n");
+            //
+            printf("Ao inserir dimensoes, tenha em mente que a dimensao que sera ancestral\n");
+            printf("na hierarquia de agregacoes deve ser cadastrada PRIMEIRO.\n");
             dims.qtd_dimensoes++;
             dims.lista_dimensoes = realloc(dims.lista_dimensoes, sizeof(dimensao)*dims.qtd_dimensoes);
             dims.lista_dimensoes[dims.qtd_dimensoes-1] = le_nova_dimensao();
@@ -398,7 +410,7 @@ int **gera_hierarquias(dimensoes dims, int *quantidade_hier, int **qtd_dimensoes
                                                            &qtd_dimensoes_por_hierarquia[qtd_hierarquias-1]);
         }
     }
-
+    //Reordenada cada hierarquia para que os ancestrais fiquem posicionados antes dos descendentes
     for(i=0; i < qtd_hierarquias; i++) {
         hierarquias[i] = inverte_vetor(&hierarquias[i], qtd_dimensoes_por_hierarquia[i]);
     }

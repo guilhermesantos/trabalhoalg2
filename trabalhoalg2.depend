@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1481066489 source:d:\documents\c_workspace\trabalhoalg2\main.c
+1481162448 source:d:\documents\c_workspace\trabalhoalg2\main.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
@@ -12,11 +12,11 @@
 1478008574 source:d:\documents\c_workspace\trabalhoalg2\teste.c
 	<stdio.h>
 
-1481066489 source:d:\documents\c_workspace\trabalhoalg2\grafo_lista.c
+1481160677 source:d:\documents\c_workspace\trabalhoalg2\grafo_lista.c
 	"grafo_lista.h"
 	<string.h>
 
-1481156442 d:\documents\c_workspace\trabalhoalg2\grafo_lista.h
+1481157127 d:\documents\c_workspace\trabalhoalg2\grafo_lista.h
 	<stdio.h>
 	<stdlib.h>
 
