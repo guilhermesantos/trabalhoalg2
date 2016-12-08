@@ -117,8 +117,8 @@ int main() {
     //Indices de iteracao
     int i, j;
 
-    //Guarda a quantidade de hierarquias cadastradas. Variavel preenchida na busca em profundidade
-    //das hierarquias
+    //Guarda a quantidade de hierarquias cadastradas. Variavel preenchida na busca recursiva
+    //por hierarquias
     int quantidade_hierarquias;
     //Vetor que guarda a quantidade de dimensoes em uma hierarquia
     //Cada posicao do vetor guarda a quantidade de dimensoes da hierarquia correspondente
@@ -704,21 +704,29 @@ void exibe_dimensao(dimensao dim) {
     }
 }
 
-//Le da tela todos os atributos de uma dimensao, cria a dimensao com esses atributos e retorna
+//Le da tela todos os atributos de uma dimensao, cria a dimensao com esses atributos e retorna.
 //Usado no cadastro de uma nova dimensao
 dimensao le_nova_dimensao() {
     dimensao d;
+    //O nome pode ter no maximo 50 caracteres
     char *nome_dimensao = malloc(sizeof(char)*50);
     char sigla_dimensao;
+    //Le o nome
     printf("Digite o nome da dimensao: ");
     scanf("%s", nome_dimensao);
+    //Realoca o nome pra ter o tamanho correto da string
     nome_dimensao = realloc(nome_dimensao, sizeof(char)*(strlen(nome_dimensao)+1));
+    //Le a sigla
     printf("Digite a sigla que representara essa dimensao: ");
     scanf(" %c", &sigla_dimensao);
     d.nome = nome_dimensao;
     d.sigla = sigla_dimensao;
+    //Coloca a agregacao da dimensao como -1, significando que nao tem agregacao cadastrada
+    //para esta dimensao ainda
     d.agregacao = -1;
+    //Inicializa a lista de atributos com null
     d.atributos = NULL;
+    //A dimensao comeca com 0 atributos
     d.qtd_atributos = 0;
     return d;
 }
