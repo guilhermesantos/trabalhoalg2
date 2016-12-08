@@ -643,7 +643,7 @@ void exibe_menu() {
 int escolhe_dimensao(dimensoes dims) {
     int opcao_dimensao = 0;
     exibe_dimensoes(dims);
-    printf("\nEscolha a dimensao: ");
+    printf("\nEscolha a dimensao pelo NUMERO: ");
     scanf("%d", &opcao_dimensao);
     //Valida se a opcao digitada nao eh maior do que o numero de dimensoes cadastradas
     if(opcao_dimensao > dims.qtd_dimensoes-1) {
