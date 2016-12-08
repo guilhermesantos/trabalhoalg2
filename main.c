@@ -411,10 +411,13 @@ int **gera_hierarquias(dimensoes dims, int *quantidade_hier, int **qtd_dimensoes
 //Funcao utilitaria que inverte um vetor de inteiros e substitui no
 //vetor referenciado pelo ponteiro enviado por argumento
 int *inverte_vetor(int **vetor, int qtd_elems) {
+    //Indices pra controle de iteracao
+    //Indice ascendente
     int i;
+    //Indice descendente
     int j = qtd_elems-1;
     int *novo_vetor = malloc(sizeof(int)*qtd_elems);
-    //Itera sobre os elementos do vetor original
+    //Itera sobre os elementos do vetor original e inverte os valores
     for(i=0; i < qtd_elems; i++) {
         novo_vetor[j] = vetor[0][i];
         j--;
@@ -427,17 +430,22 @@ int *inverte_vetor(int **vetor, int qtd_elems) {
 }
 
 //Funcao recursiva que faz parte da busca em profundidade que gera
-//a matriz de hierarquias.
+//a matriz de hierarquias, usada para gerar o grafo de derivacao.s
 int *descobre_hierarquia(dimensoes *dims, int indice_dim, int **hierarquia_dimensao,
                          int *qtd_agregacoes_hierarquia) {
+    //Condicao de parada da recursao. a dimensao nao tem mais nenhuma agregacao
     if(indice_dim == -1 || dims->lista_dimensoes[indice_dim].cor == preto) {
         return;
     }
-
+    //chamada recursiva, passando a agregacao da dimensao atual
     descobre_hierarquia(dims, dims->lista_dimensoes[indice_dim].agregacao,
                         hierarquia_dimensao, qtd_agregacoes_hierarquia);
+    //pinta a dimensao atual de preto, pra que, se a busca encontrar duas vezes a mesma dimensao,
+    //ela nao vai ser adicionada duas vezes
     dims->lista_dimensoes[indice_dim].cor = preto;
     (*qtd_agregacoes_hierarquia)++;
+
+    //coloca na matriz de hierarquias
     hierarquia_dimensao[0] = realloc(hierarquia_dimensao[0], sizeof(int)*(*qtd_agregacoes_hierarquia));
     hierarquia_dimensao[0][(*qtd_agregacoes_hierarquia)-1] = indice_dim;
     return hierarquia_dimensao[0];
@@ -447,32 +455,50 @@ int *descobre_hierarquia(dimensoes *dims, int indice_dim, int **hierarquia_dimen
 //e escreve em um arquivo.
 void grava_codigo_dot_em_arquivo(char *codigo_dot) {
     FILE *f = fopen("grafo.dot", "w");
+    //Tenta criar o arquivo. Se nao conseguir, é porque tem algo muito errado
+    //e a funcao deve encerrar.
     if(f == NULL) {
         printf("Erro. O arquivo do grafo nao pode ser criado.\n\n");
         return;
     }
+    //Escreve o codigo dot no arquivo
     fwrite(codigo_dot, sizeof(char), strlen(codigo_dot)+1, f);
+    //Fecha o arquivo
     fclose(f);
+    //Avisa o usuario
     printf("Foi gerado o arquivo grafo.dot com a visualizacao do grafo criado.\n\n");
 }
 
 //Grava todas as dimensoes e hierarquias cadastradas em um arquivo binario.
 void grava_dados_arquivo(dimensoes dims) {
     FILE *f = fopen("dimensoes.dat", "wb");
-    //Se nao conseguiu criar o arquivo, significa que houve um problema.
+    //Se nao conseguiu criar o arquivo, significa que houve um problema e funcao deve encerrar
     if(f == NULL) {
         printf("Erro. O arquivo especificado nao pode ser criado.\n");
         return;
     }
+    //Escreve aquantidade de dimensoes
     fwrite(&(dims.qtd_dimensoes), sizeof(int), 1, f);
+
+    //Variaveis auxiliares.
+    //i e j sao indices pra controle do loop
+    //tam_nome eh a variavel auxiliar pra colocar o tamanho do nome da dimensao
+    //pra gravar no arquivo, porque a funcao fwrite exige um ponteiro
+    //tam_atributo eh usada pra gravar o tamanho de cada atributo, pela mesma razao da anterior
+    //cor. guarda a cor do vertice.
     int i, j, tam_nome, tam_atributo, cor;
 
-    //Varre as dimensoes e cadastra uma a uma
+    //Varre as dimensoes e grava uma a uma
     for(i=0; i < dims.qtd_dimensoes; i++) {
+        //grava a sigla
         fwrite(&(dims.lista_dimensoes[i].sigla), sizeof(char), 1, f);
         tam_nome = strlen(dims.lista_dimensoes[i].nome)+1;
+        //grava o tamanho do nome. isso eh necessario porque o vetor de chars tem tamanho variavel,
+        //entao a funcao que vai ler depois tem que saber onde parar.
         fwrite(&tam_nome, sizeof(int), 1, f);
+        //grava o nome da dimensao
         fwrite(dims.lista_dimensoes[i].nome, sizeof(char), strlen(dims.lista_dimensoes[i].nome)+1, f);
+        //grava a quantidade de atributos da dimensao, pra conseguir recuperar depois
         fwrite(&(dims.lista_dimensoes[i].qtd_atributos), sizeof(int), 1, f);
 
         for(j=0; j < dims.lista_dimensoes[i].qtd_atributos; j++) {
