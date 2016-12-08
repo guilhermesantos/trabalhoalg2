@@ -177,11 +177,13 @@ int main() {
             break;
         case 4://configura uma dimensao como uma agregacao de outra dimensao
             exibe_dimensoes(dims);
+            printf("Digite o NUMERO mostrado ao lado da dimensao para escolher.\n");
             printf("Escolha o ancestral: ");
             scanf("%d", &ancestral);
             printf("\n");
 
             exibe_dimensoes(dims);
+            printf("Digite o NUMERO mostrado ao lado da dimensao para escolher.\n");
             printf("Escolha o descendente: ");
             scanf("%d", &descendente);
             printf("\n");
